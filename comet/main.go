@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"notify-center/pkg/redis"
 )
 
 var (
@@ -17,6 +18,9 @@ var (
 )
 
 func main() {
+
+	redis.NewRedisConn()
+	redis.Subscribe()
 
 	engine := gin.Default()
 
