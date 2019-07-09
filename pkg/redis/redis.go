@@ -1,10 +1,12 @@
 package redis
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
 	"notify-center/pkg/dto"
+	"time"
 )
 
 var client *redis.Client
@@ -39,5 +41,30 @@ func Subscribe(handle func(msg *dto.RedisStreamMessage)) {
 		logrus.Info(channel, "收到消息", msg.Payload)
 		_ := msgObj.UnMarshal([]byte(msg.Payload))
 		handle(&msgObj)
+	}
+}
+
+// 读取缓存
+func GetHash(k, hk string) (r string, e error) {
+	r, e = client.HGet(k, hk).Result()
+	logrus.Info(r)
+	if e == redis.Nil {
+		logrus.Error("key不存在; ", k)
+		return "", errors.New("key不存在")
+	}
+	if e != nil {
+		logrus.Error("读取缓存异常; ", e)
+		return "", errors.New("读取缓存异常")
+	}
+
+	return
+}
+
+// 设置缓存
+func SetHash(k, hk string, v []byte, t float64) {
+	s, e := client.HSet(k, hk, v).Result()
+	client.Expire(k, time.Duration(t)*time.Second)
+	if e != nil {
+		logrus.Error("写入缓存异常", s, e)
 	}
 }

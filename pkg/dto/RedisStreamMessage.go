@@ -7,7 +7,7 @@ import (
 
 // redis订阅发布通信模型
 type RedisStreamMessage struct {
-	JsjUniqueId string
+	JsjUniqueId int
 	Body        string
 }
 

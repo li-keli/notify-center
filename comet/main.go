@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"notify-center/pkg/dto"
 	"notify-center/pkg/redis"
 )
 
@@ -19,21 +20,22 @@ var (
 
 func main() {
 
+	// redis 订阅发布
 	redis.NewRedisConn()
-	redis.Subscribe()
-
-	engine := gin.Default()
-
-	engine.GET("/health/:jsjUniqueId", func(c *gin.Context) {
-		c.String(http.StatusOK, string(conns.Size()))
-		if v, isfound := conns.Get(c.Param("jsjUniqueId")); isfound {
+	redis.Subscribe(func(msg *dto.RedisStreamMessage) {
+		if v, isfound := conns.Get(msg.JsjUniqueId); isfound {
 			conn := v.(*websocket.Conn)
-			_ = conn.WriteMessage(1, []byte("hello"))
+			_ = conn.WriteMessage(1, []byte(msg.Body))
 		}
 	})
 
+	engine := gin.Default()
+	engine.GET("/health/:jsjUniqueId", func(c *gin.Context) {
+		c.String(http.StatusOK, string(conns.Size()))
+	})
 	engine.GET("/v1/ws/:targetType/:jsjUniqueId", func(c *gin.Context) {
 		var (
+			//targetType  = c.Param("targetType")
 			jsjUniqueId = c.Param("jsjUniqueId")
 		)
 
