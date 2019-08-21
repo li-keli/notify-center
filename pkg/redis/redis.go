@@ -13,7 +13,7 @@ var client *redis.Client
 
 func NewRedisConn() {
 	client = redis.NewClient(&redis.Options{
-		Addr:     "172.16.7.20",
+		Addr:     "172.16.7.20:6379",
 		Password: "",
 		DB:       3,
 	})
@@ -39,7 +39,7 @@ func Subscribe(handle func(msg *dto.RedisStreamMessage)) {
 	for msg := range channel {
 		var msgObj = dto.RedisStreamMessage{}
 		logrus.Info(channel, "收到消息", msg.Payload)
-		_ := msgObj.UnMarshal([]byte(msg.Payload))
+		_ = msgObj.UnMarshal([]byte(msg.Payload))
 		handle(&msgObj)
 	}
 }
