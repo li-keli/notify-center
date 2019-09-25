@@ -2,7 +2,6 @@ package redis
 
 import (
 	"errors"
-	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
 	"notify-center/pkg/dto"
@@ -18,7 +17,7 @@ func NewRedisConn() {
 		DB:       3,
 	})
 	pong, err := client.Ping().Result()
-	fmt.Println(pong, err)
+	logrus.Info(pong, err)
 }
 
 // 消息发布
