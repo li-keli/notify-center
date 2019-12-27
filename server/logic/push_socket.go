@@ -1,23 +1,27 @@
 package logic
 
 import (
+	"encoding/json"
 	"notify-center/pkg/dto"
 	"notify-center/pkg/redis"
-	"strconv"
+	"notify-center/server/api/v1/vo"
 )
 
 // WebSocket推送
 type PushWSocket struct {
+	notifyVo vo.NotifyVo
 }
 
-func (p *PushWSocket) PushMessage(pushKey string) {
-	jsjUniqueId, _ := strconv.Atoi(pushKey)
+func (p *PushWSocket) PushMessage(pushToken string) error {
+	marshal, e := json.Marshal(p.notifyVo.Data)
 	// 发送WS广播
 	redis.Publish(&dto.RedisStreamMessage{
-		UniqueId: jsjUniqueId,
+		UniqueId: p.notifyVo.JsjUniqueId,
 		Body: dto.RedisStreamMessageBody{
-			MAction: "demo",
-			MBody:   "Ok i got the message",
+			MAction: p.notifyVo.Route,
+			MBody:   string(marshal),
 		},
 	})
+
+	return e
 }

@@ -1,13 +1,16 @@
 package logic
 
+import (
+	"notify-center/pkg/db"
+	"notify-center/server/api/v1/vo"
+)
+
 // 推送逻辑
 type PushActuator interface {
-	PushMessage(pushKey string)
+	PushMessage(pushToken string) error
 }
 
-func BuildPushActuator(t int) PushActuator {
-	if t == 400 {
-		return &PushWSocket{}
-	}
-	return nil
+// 构造推送器
+func BuildPushActuator(notifyVo vo.NotifyVo, app db.AppEntity, config db.DicConfigEntity) PushActuator {
+	return &PushWSocket{notifyVo}
 }
