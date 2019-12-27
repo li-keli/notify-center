@@ -16,13 +16,14 @@ func NewRedisConn() {
 		Password: "",
 		DB:       3,
 	})
-	pong, err := client.Ping().Result()
-	logrus.Info(pong, err)
+	if _, e := client.Ping().Result(); e != nil {
+		logrus.Info(e)
+	}
 }
 
 // 消息发布
 func Publish(msg *dto.RedisStreamMessage) {
-	s, _ := msg.Marshal()
+	s := msg.Marshal()
 	if err := client.Publish("homework", s).Err(); err != nil {
 		logrus.Error("redis消息发布异常", err)
 	}
@@ -37,29 +38,36 @@ func Subscribe(handle func(msg *dto.RedisStreamMessage)) {
 	channel := pubSub.Channel()
 	for msg := range channel {
 		var msgObj = dto.RedisStreamMessage{}
-		logrus.Info(channel, "收到消息", msg.Payload)
+		logrus.Info("收到消息 ", msg.Payload)
 		_ = msgObj.UnMarshal([]byte(msg.Payload))
 		handle(&msgObj)
 	}
 }
 
-// 读取缓存
-func GetHash(k, hk string) (r string, e error) {
-	r, e = client.HGet(k, hk).Result()
-	logrus.Info(r)
+// 读取缓存(Hash)
+func GetHashAll(k string) (r []string, e error) {
+	result, e := client.HGetAll(k).Result()
 	if e == redis.Nil {
 		logrus.Error("key不存在; ", k)
-		return "", errors.New("key不存在")
+		return []string{}, errors.New("key不存在")
 	}
 	if e != nil {
 		logrus.Error("读取缓存异常; ", e)
-		return "", errors.New("读取缓存异常")
+		return []string{}, errors.New("读取缓存异常")
 	}
 
+	for s, _ := range result {
+		r = append(r, s)
+	}
 	return
 }
 
-// 设置缓存
+// 删除Hash中的Field
+func DelHashField(k, f string) {
+	go client.HDel(k, f)
+}
+
+// 设置缓存(Hash)
 func SetHash(k, hk string, v []byte, t float64) {
 	s, e := client.HSet(k, hk, v).Result()
 	client.Expire(k, time.Duration(t)*time.Second)

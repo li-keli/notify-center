@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/emirpasic/gods/lists/arraylist"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"notify-center/pkg/dto"
@@ -22,30 +24,38 @@ var (
 
 type ConnStruct struct {
 	Key  int
-	Conn *websocket.Conn
+	Sid  string
+	Conn *websocket.Conn `json:"-"`
 }
 
 func main() {
 
-	// redis 订阅发布
+	// 连接redis
 	redis.NewRedisConn()
+
+	// redis 订阅发布
 	go redis.Subscribe(func(msg *dto.RedisStreamMessage) {
-		if v, b := connList.Get(msg.JsjUniqueId); b {
-			conn := v.(*ConnStruct).Conn
-			_ = conn.WriteMessage(1, []byte(msg.Body))
-		}
+		connList.Each(func(index int, value interface{}) {
+			targetConn := value.(*ConnStruct)
+			if targetConn.Key == msg.UniqueId {
+				logrus.Infof("处理广播消息 %s", targetConn.Key)
+				if e := targetConn.Conn.WriteMessage(1, []byte(msg.Body.Marshal())); e != nil {
+					redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
+				}
+			}
+		})
 	})
 
 	engine := gin.Default()
-	engine.GET("/health/:jsjUniqueId", func(c *gin.Context) {
+	engine.GET("/health/:uniqueId", func(c *gin.Context) {
 		logrus.Info("会话列表容量", connList.Size())
-		var jsjUniqueId, _ = strconv.Atoi(c.Param("jsjUniqueId"))
+		var uniqueId, _ = strconv.Atoi(c.Param("uniqueId"))
 		_, obj := connList.Find(func(index int, value interface{}) bool {
 			stru, b := value.(*ConnStruct)
 			if !b {
 				return false
 			}
-			if stru.Key == jsjUniqueId {
+			if stru.Key == uniqueId {
 				return true
 			}
 			return false
@@ -55,10 +65,11 @@ func main() {
 
 		c.String(http.StatusOK, string(connList.Size()))
 	})
-	engine.GET("/v1/ws/:targetType/:jsjUniqueId", func(c *gin.Context) {
+	engine.GET("/v1/ws/:targetType/:uniqueId", func(c *gin.Context) {
 		var (
-			//targetType  = c.Param("targetType")
-			jsjUniqueId, _ = strconv.Atoi(c.Param("jsjUniqueId"))
+			//targetType, _  = strconv.Atoi(c.Param("targetType"))
+			uniqueId, _ = strconv.Atoi(c.Param("uniqueId"))
+			sId         = uuid.NewV4().String()
 		)
 
 		ws, err := upgrade.Upgrade(c.Writer, c.Request, nil)
@@ -67,13 +78,18 @@ func main() {
 		}
 
 		connModule := &ConnStruct{
-			Key:  jsjUniqueId,
+			Key:  uniqueId,
+			Sid:  sId,
 			Conn: ws,
 		}
 		connList.Add(connModule)
+		connModuleBytes, _ := json.Marshal(connModule)
+		redis.SetHash(strconv.Itoa(uniqueId), sId, connModuleBytes, 60)
+		logrus.Infof("WS连接数：%d", connList.Size())
 		defer func() {
-			connList.Remove(connList.IndexOf(connModule))
 			ws.Close()
+			connList.Remove(connList.IndexOf(connModule))
+			redis.DelHashField(strconv.Itoa(uniqueId), sId)
 		}()
 
 		for {
@@ -94,5 +110,5 @@ func main() {
 		}
 	})
 
-	_ = engine.Run(":8081")
+	_ = engine.Run("localhost:8081")
 }

@@ -7,19 +7,36 @@ import (
 
 // redis订阅发布通信模型
 type RedisStreamMessage struct {
-	JsjUniqueId int
-	Body        string
+	UniqueId int
+	Body     RedisStreamMessageBody
+}
+type RedisStreamMessageBody struct {
+	MAction string
+	MBody   string
 }
 
-func (rsm *RedisStreamMessage) Marshal() (string, error) {
+func (rsm *RedisStreamMessage) Marshal() string {
 	bytes, e := json.Marshal(rsm)
 	if e != nil {
 		logrus.Error("RedisStreamMessage序列化异常", e)
 	}
-	return string(bytes), e
+	return string(bytes)
 }
 
 func (rsm *RedisStreamMessage) UnMarshal(b []byte) (e error) {
+	e = json.Unmarshal(b, &rsm)
+	return
+}
+
+func (rsm *RedisStreamMessageBody) Marshal() string {
+	bytes, e := json.Marshal(rsm)
+	if e != nil {
+		logrus.Error("RedisStreamMessageBody序列化异常", e)
+	}
+	return string(bytes)
+}
+
+func (rsm *RedisStreamMessageBody) UnMarshal(b []byte) (e error) {
 	e = json.Unmarshal(b, &rsm)
 	return
 }

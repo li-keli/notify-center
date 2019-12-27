@@ -2,7 +2,7 @@ package vo
 
 type RegisterKtInput struct {
 	FormId      string `json:"FormId"`
-	JsjUniqueId int    `json:"JsjUniqueId"`
+	JsjUniqueId int    `json:"UniqueId"`
 	Prepay      bool   `json:"Prepay"`
 	PushToken   string `json:"PushToken"`
 }
