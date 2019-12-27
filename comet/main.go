@@ -8,6 +8,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"notify-center/pkg/constant"
 	"notify-center/pkg/dto"
 	"notify-center/pkg/redis"
 	"strconv"
@@ -23,9 +24,11 @@ var (
 )
 
 type ConnStruct struct {
-	Key  int
-	Sid  string
-	Conn *websocket.Conn `json:"-"`
+	Key   int
+	Sid   string
+	Tid   int
+	TName string
+	Conn  *websocket.Conn `json:"-"`
 }
 
 func main() {
@@ -67,24 +70,26 @@ func main() {
 	})
 	engine.GET("/v1/ws/:targetType/:uniqueId", func(c *gin.Context) {
 		var (
-			//targetType, _  = strconv.Atoi(c.Param("targetType"))
-			uniqueId, _ = strconv.Atoi(c.Param("uniqueId"))
-			sId         = uuid.NewV4().String()
+			targetType, _ = strconv.Atoi(c.Param("targetType"))
+			uniqueId, _   = strconv.Atoi(c.Param("uniqueId"))
+			sId           = uuid.NewV4().String()
+			ws, err       = upgrade.Upgrade(c.Writer, c.Request, nil)
+			connModule    = &ConnStruct{
+				Key:   uniqueId,
+				Sid:   sId,
+				Tid:   targetType,
+				TName: constant.TargetTypeValueOf(constant.TargetType(targetType)),
+				Conn:  ws,
+			}
 		)
 
-		ws, err := upgrade.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
 			return
 		}
 
-		connModule := &ConnStruct{
-			Key:  uniqueId,
-			Sid:  sId,
-			Conn: ws,
-		}
 		connList.Add(connModule)
 		connModuleBytes, _ := json.Marshal(connModule)
-		redis.SetHash(strconv.Itoa(uniqueId), sId, connModuleBytes, 60)
+		redis.SetHash(strconv.Itoa(uniqueId), sId, connModuleBytes, 10)
 		logrus.Infof("WS连接数：%d", connList.Size())
 		defer func() {
 			ws.Close()
@@ -101,6 +106,7 @@ func main() {
 
 			if string(message) == "+" {
 				message = []byte("-")
+				redis.SetHash(strconv.Itoa(uniqueId), sId, connModuleBytes, 10)
 			}
 			//写入ws数据
 			err = ws.WriteMessage(mt, message)
