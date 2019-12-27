@@ -20,7 +20,7 @@ func main() {
 		ctx.String(http.StatusOK, "up")
 	})
 	engine.POST("/v1/terminal/registerKt", v1.RegisterTerminal)
-	engine.GET("/notify", v1.Notify)
+	engine.POST("/notify", v1.Notify)
 
 	_ = engine.Run("localhost:8080")
 }

@@ -7,18 +7,18 @@ import (
 	"notify-center/server/api/v1/vo"
 )
 
-// WebSocket推送
+// WebSocket推送（独立推送）
 type PushWSocket struct {
-	notifyVo vo.NotifyVo
+	NotifyVo vo.NotifyVo
 }
 
-func (p *PushWSocket) PushMessage(pushToken string) error {
-	marshal, e := json.Marshal(p.notifyVo.Data)
+func (p PushWSocket) PushMessage() error {
+	marshal, e := json.Marshal(p.NotifyVo.Data)
 	// 发送WS广播
 	redis.Publish(&dto.RedisStreamMessage{
-		UniqueId: p.notifyVo.JsjUniqueId,
+		UniqueId: p.NotifyVo.JsjUniqueId,
 		Body: dto.RedisStreamMessageBody{
-			MAction: p.notifyVo.Route,
+			MAction: p.NotifyVo.Route,
 			MBody:   string(marshal),
 		},
 	})

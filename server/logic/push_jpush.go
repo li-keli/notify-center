@@ -22,7 +22,13 @@ func (p *PushJPush) PushMessage(pushToken string) error {
 	ad.SetID([]string{pushToken})
 
 	var notice jpushclient.Notice
-	notice.SetAndroidNotice(&jpushclient.AndroidNotice{Alert: p.notifyVo.Title})
+	notice.SetAndroidNotice(&jpushclient.AndroidNotice{
+		Alert: p.notifyVo.Title,
+		Extras: map[string]interface{}{
+			"MAction": p.notifyVo.Route,
+			"MBody":   string(p.notifyVo.DataToBytes()),
+		}},
+	)
 
 	var msg jpushclient.Message
 	msg.Title = p.notifyVo.Title

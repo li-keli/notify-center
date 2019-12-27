@@ -5,8 +5,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"notify-center/pkg/db"
+	"notify-center/pkg/redis"
 	"notify-center/server/api/v1/vo"
 	"notify-center/server/logic"
+	"strconv"
 )
 
 // 注册终端
@@ -37,6 +39,24 @@ func Notify(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		return
 	}
+	logrus.Info("请求数据：%v", input)
+
+	// 获取推送目标平台配置
+	config, err := (&db.DicConfigEntity{}).FindConfig(input.TargetType)
+	if err != nil {
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
+		return
+	}
+	logrus.Info("获取推送目标平台配置：%v", config)
+
+	// 尝试进行WebSocket推送
+	if all, _ := redis.GetHashAll(strconv.Itoa(input.JsjUniqueId)); len(all) > 0 {
+		err = logic.PushWSocket{NotifyVo: input}.PushMessage()
+		if err == nil {
+			ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success())
+			return
+		}
+	}
 
 	// 获取推送目标数据
 	entity, err := (&db.AppEntity{}).FindAppEntityByJsjId(input.JsjUniqueId)
@@ -44,18 +64,14 @@ func Notify(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		return
 	}
+	logrus.Info("获取推送目标数据：%v", entity)
 
-	// 获取推送目标平台配置
-	config, err := (&db.DicConfigEntity{}).FindConfig(entity.TargetType)
-	if err != nil {
-		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
-		return
-	}
-
+	// 发起推送
 	if err := logic.BuildPushActuator(input, entity, config).PushMessage(entity.PushToken); err != nil {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		return
 	}
 
+	logrus.Info("推送成功")
 	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success())
 }
