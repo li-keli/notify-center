@@ -15,9 +15,9 @@ type PushActuator interface {
 func BuildPushActuator(notifyVo vo.NotifyVo, app db.NotifyRegister, config db.NotifyConfig) PushActuator {
 	switch app.PlatformTypeId {
 	case constant.IOS:
-		return &PushApns{notifyVo, config}
+		return PushApns{notifyVo, config}
 	case constant.Android:
-		return &PushJPush{notifyVo, config}
+		return PushJPush{notifyVo, config}
 	case constant.DingDing:
 		return nil
 	}

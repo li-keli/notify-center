@@ -21,7 +21,7 @@ func RegisterTerminal(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		logrus.Panic("参数异常")
 	}
-	logrus.Println(input)
+	logrus.Info(input)
 
 	register := db.NotifyRegister{
 		JsjUniqueId:      input.JsjUniqueId,
@@ -108,7 +108,7 @@ func Notify(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error("未发现接收平台配置信息"))
 		return
 	}
-	logrus.Info("获取推送目标平台配置：", config)
+	logrus.Infof("获取推送目标平台配置：%#v", config)
 
 	// 记录推送数据
 	nMessage.Insert(db.NotifyMsg{
@@ -117,7 +117,7 @@ func Notify(ctx *gin.Context) {
 		PlatformTypeName: one.PlatformTypeName,
 		TargetTypeId:     input.TargetType,
 		TargetTypeName:   constant.TargetTypeValueOf(input.TargetType),
-		DataContent:      input.Message,
+		DataContent:      input.DataToStr(),
 		CreateTime:       time.Now(),
 	})
 

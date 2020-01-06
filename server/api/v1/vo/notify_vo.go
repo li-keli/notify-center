@@ -21,3 +21,8 @@ func (n *NotifyVo) DataToBytes() []byte {
 	marshal, _ := json.Marshal(n.Data)
 	return marshal
 }
+
+func (n *NotifyVo) DataToStr() string {
+	marshal, _ := json.Marshal(n.Data)
+	return string(marshal)
+}

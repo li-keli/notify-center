@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"errors"
 	"fmt"
 	"github.com/sideshow/apns2"
 	"github.com/sideshow/apns2/certificate"
@@ -10,13 +11,13 @@ import (
 	"notify-center/server/api/v1/vo"
 )
 
-// 苹果APNS推送
+// APNS推送
 type PushApns struct {
 	notifyVo vo.NotifyVo
 	config   db.NotifyConfig
 }
 
-func (p *PushApns) PushMessage(pushToken string) error {
+func (p PushApns) PushMessage(pushToken string) error {
 	config, err := p.config.IosConfig()
 	if err != nil {
 		logrus.Error("构造APNS推送配置错误", err)
@@ -43,8 +44,12 @@ func (p *PushApns) PushMessage(pushToken string) error {
 	client := apns2.NewClient(cert).Production()
 	res, err := client.Push(notification)
 	if err != nil {
-		logrus.Error("Error:", err)
+		logrus.Error("Apns推送错误，", err)
 		return err
+	}
+	if res.StatusCode != 200 {
+		logrus.Error("Apns推送失败，", res.Reason)
+		return errors.New(res.Reason)
 	}
 
 	fmt.Printf("%v %v %v\n", res.StatusCode, res.ApnsID, res.Reason)

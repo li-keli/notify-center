@@ -56,7 +56,6 @@ func (n NotifyConfig) AndroidConfig() (config AndroidConfig, err error) {
 }
 
 func (n NotifyConfig) FindOne(platformType constant.PlatformType, targetType constant.TargetType) (r NotifyConfig, err error) {
-	logrus.Info("查找应用配置：", platformType, targetType)
 	err = conn.Model(&n).Where(`platform_type_id = ? and target_type_id = ?`, platformType, targetType).First(&r).Error
 	return
 }

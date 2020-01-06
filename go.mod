@@ -14,4 +14,6 @@ require (
 	github.com/sideshow/apns2 v0.20.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/ylywyn/jpush-api-go-client v0.0.0-20190906031852-8c4466c6e369
+	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
+	golang.org/x/text v0.3.2 // indirect
 )
