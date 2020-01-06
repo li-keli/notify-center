@@ -2,6 +2,8 @@
 package db
 
 import (
+	"encoding/json"
+	"github.com/sirupsen/logrus"
 	"notify-center/pkg/constant"
 	"time"
 )
@@ -14,6 +16,7 @@ type NotifyConfig struct {
 	TargetTypeName   string                `gorm:"column:target_type_name"`
 	ConfigData       string                `gorm:"column:config_data"`
 	CreateTime       time.Time             `gorm:"column:create_time"`
+	ConfigDataModel  interface{}           `gorm:"-"` // 数据库映射忽略字段，此字段来源于ConfigData
 }
 
 type IosConfig struct {
@@ -22,8 +25,8 @@ type IosConfig struct {
 	BundleId   string
 	Password   string
 
-	P12DevPath  string
-	P12ProdPath string
+	p12DevPath  string
+	p12ProdPath string
 }
 
 type AndroidConfig struct {
@@ -31,6 +34,28 @@ type AndroidConfig struct {
 	Secret string
 }
 
-func (*NotifyConfig) FindConfig() {
+func (n NotifyConfig) IosConfig() (config IosConfig, err error) {
+	if err = json.Unmarshal([]byte(n.ConfigData), &config); err != nil {
+		logrus.Error("序列化IosConfig错误，原文：", n.ConfigData)
+		return
+	}
+	if config.Production {
+		config.P12Path = config.p12ProdPath
+	} else {
+		config.P12Path = config.p12DevPath
+	}
 
+	return
+}
+
+func (n NotifyConfig) AndroidConfig() (config AndroidConfig, err error) {
+	if err := json.Unmarshal([]byte(n.ConfigData), &config); err != nil {
+		logrus.Error("序列化AndroidConfig错误，原文：", n.ConfigData)
+	}
+	return
+}
+
+func (n NotifyConfig) FindOne(platformType constant.PlatformType, targetType constant.TargetType) (r NotifyConfig, err error) {
+	err = conn.Model(&n).Where(`platform_type_id = ? and target_type_id = ?`, platformType, targetType).First(&r).Error
+	return
 }

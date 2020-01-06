@@ -72,7 +72,11 @@ func UnRegisterTerminal(ctx *gin.Context) {
 
 // 发送推送消息
 func Notify(ctx *gin.Context) {
-	var input vo.NotifyVo
+	var (
+		input     vo.NotifyVo
+		nConfig   db.NotifyConfig
+		nRegister db.NotifyRegister
+	)
 
 	if err := ctx.BindJSON(&input); err != nil {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
@@ -89,29 +93,29 @@ func Notify(ctx *gin.Context) {
 		}
 	}
 
-	//// 获取推送目标平台配置
-	//config, err := (&db.DicConfigEntity{}).FindConfig(input.TargetType)
-	//if err != nil {
-	//	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
-	//	return
-	//}
-	//logrus.Info("获取推送目标平台配置：%v", config)
-	//
-	//// 获取推送目标数据
-	//entity, err := (&db.AppEntity{}).FindAppEntityByJsjId(input.JsjUniqueId)
-	//if err != nil {
-	//	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
-	//	return
-	//}
-	//logrus.Info("获取推送目标数据：%v", entity)
-	//
-	//// 记录推送数据
-	//
-	//// 发起推送
-	//if err := logic.BuildPushActuator(input, entity, config).PushMessage(entity.PushToken); err != nil {
-	//	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
-	//	return
-	//}
+	// 获取推送目标的数据
+	one, err := nRegister.FindOne(input.JsjUniqueId)
+	if err != nil {
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
+		return
+	}
+	logrus.Info("获取推送目标数据：%v", one)
+
+	// 获取推送目标平台配置
+	config, err := nConfig.FindOne(one.PlatformTypeId, input.TargetType)
+	if err != nil {
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
+		return
+	}
+	logrus.Info("获取推送目标平台配置：%v", config)
+
+	// 记录推送数据
+
+	// 发起推送
+	if err := logic.BuildPushActuator(input, one, config).PushMessage(one.PushToken); err != nil {
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
+		return
+	}
 
 	logrus.Info("推送成功")
 	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success())
