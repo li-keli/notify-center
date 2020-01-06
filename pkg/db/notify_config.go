@@ -20,13 +20,12 @@ type NotifyConfig struct {
 }
 
 type IosConfig struct {
-	Production bool
-	P12Path    string
-	BundleId   string
-	Password   string
+	P12Path  string
+	BundleId string
+	Password string
 
-	p12DevPath  string
-	p12ProdPath string
+	P12DevPath  string
+	P12ProdPath string
 }
 
 type AndroidConfig struct {
@@ -39,11 +38,12 @@ func (n NotifyConfig) IosConfig() (config IosConfig, err error) {
 		logrus.Error("序列化IosConfig错误，原文：", n.ConfigData)
 		return
 	}
-	if config.Production {
-		config.P12Path = config.p12ProdPath
-	} else {
-		config.P12Path = config.p12DevPath
-	}
+	//if config.Production {
+	//	config.P12Path = config.P12ProdPath
+	//} else {
+	//	config.P12Path = config.P12DevPath
+	//}
+	config.P12Path = config.P12ProdPath
 
 	return
 }
@@ -56,6 +56,7 @@ func (n NotifyConfig) AndroidConfig() (config AndroidConfig, err error) {
 }
 
 func (n NotifyConfig) FindOne(platformType constant.PlatformType, targetType constant.TargetType) (r NotifyConfig, err error) {
+	logrus.Info("查找应用配置：", platformType, targetType)
 	err = conn.Model(&n).Where(`platform_type_id = ? and target_type_id = ?`, platformType, targetType).First(&r).Error
 	return
 }

@@ -48,7 +48,7 @@ func RegisterTerminal(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success())
+	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(""))
 }
 
 // 注销终端
@@ -67,7 +67,7 @@ func UnRegisterTerminal(ctx *gin.Context) {
 		logrus.Panic("终端注销异常")
 	}
 
-	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success())
+	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(""))
 }
 
 // 发送推送消息
@@ -76,19 +76,20 @@ func Notify(ctx *gin.Context) {
 		input     vo.NotifyVo
 		nConfig   db.NotifyConfig
 		nRegister db.NotifyRegister
+		nMessage  db.NotifyMsg
 	)
 
 	if err := ctx.BindJSON(&input); err != nil {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		return
 	}
-	logrus.Info("请求数据：%v", input)
+	logrus.Info("请求数据：", input)
 
 	// 尝试进行WebSocket推送
 	if all, _ := redis.GetHashAll(strconv.Itoa(input.JsjUniqueId)); len(all) > 0 {
 		err := logic.PushWSocket{NotifyVo: input}.PushMessage()
 		if err == nil {
-			ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success())
+			ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success("Socket推送成功"))
 			return
 		}
 	}
@@ -96,20 +97,29 @@ func Notify(ctx *gin.Context) {
 	// 获取推送目标的数据
 	one, err := nRegister.FindOne(input.JsjUniqueId)
 	if err != nil {
-		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error("未发现终端注册信息"))
 		return
 	}
-	logrus.Info("获取推送目标数据：%v", one)
+	logrus.Infof("获取推送目标数据：%#v", one)
 
 	// 获取推送目标平台配置
 	config, err := nConfig.FindOne(one.PlatformTypeId, input.TargetType)
 	if err != nil {
-		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error("未发现接收平台配置信息"))
 		return
 	}
-	logrus.Info("获取推送目标平台配置：%v", config)
+	logrus.Info("获取推送目标平台配置：", config)
 
 	// 记录推送数据
+	nMessage.Insert(db.NotifyMsg{
+		PushToken:        one.PushToken,
+		PlatformTypeId:   one.PlatformTypeId,
+		PlatformTypeName: one.PlatformTypeName,
+		TargetTypeId:     input.TargetType,
+		TargetTypeName:   constant.TargetTypeValueOf(input.TargetType),
+		DataContent:      input.Message,
+		CreateTime:       time.Now(),
+	})
 
 	// 发起推送
 	if err := logic.BuildPushActuator(input, one, config).PushMessage(one.PushToken); err != nil {
@@ -117,6 +127,6 @@ func Notify(ctx *gin.Context) {
 		return
 	}
 
-	logrus.Info("推送成功")
-	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success())
+	logrus.Info("离线推送成功")
+	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success("离线推送成功"))
 }

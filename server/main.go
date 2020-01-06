@@ -23,5 +23,5 @@ func main() {
 	engine.POST("/v2/terminal/unRegister", v1.UnRegisterTerminal)
 	engine.POST("/v2/notification/send", v1.Notify)
 
-	_ = engine.Run("127.0.0.1:8080")
+	_ = engine.Run(":8081")
 }

@@ -9,11 +9,14 @@ type BaseHead struct {
 	Message string `json:"message"`
 }
 
-func (BaseOutput) Success() BaseOutput {
+func (BaseOutput) Success(msg string) BaseOutput {
+	if msg == "" {
+		msg = "success"
+	}
 	return BaseOutput{
 		BaseHead: BaseHead{
 			Code:    "0000",
-			Message: "success",
+			Message: msg,
 		},
 	}
 }

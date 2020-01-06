@@ -1,0 +1,66 @@
+before_script:
+  - echo " CI is running... "
+
+# 编译项目
+project-build:
+  stage: build
+  tags:
+    - build
+  only:
+    - /^preview\/.*$/
+    - /^release\/.*$/
+  script:
+    - docker run -i --rm -v $(pwd):/usr/work -w /usr/work docker.jsjit.cn/golang:1.12 ./deploy.sh
+    - export GIN_MODE=debug
+    - export REPLICAS=1
+    - export VERSION=$(git --no-pager log -n 1 --no-merges --pretty=format:"%h" HEAD)
+    - docker-compose build
+    - docker-compose push
+
+# ******************************************************************************************************
+# ************************************** 测试环境配置 ****************************************************
+# ******************************************************************************************************
+notify-center-test-deploy:
+  stage: deploy
+  tags:
+    - build
+  only:
+    - /^preview\/.*$/
+  environment:
+    name: testing
+  script:
+    - export GIN_MODE=debug
+    - export REPLICAS=1
+    - export VERSION=$(git --no-pager log -n 1 --no-merges --pretty=format:"%h" HEAD)
+    - docker stack deploy --compose-file docker-compose.yml --with-registry-auth notify-center
+    - AUTHOR=$(git --no-pager log -n 1 --no-merges --pretty=format:"%an" HEAD)
+    - MESSAGE=$(git --no-pager log -n 1 --no-merges --pretty=format:"%s" HEAD)
+    - MSG="【推送网关V2】\n发布环境：🟡 测试环境 \n节点数：$REPLICAS个 \n发布者：$AUTHOR \n版本hash：$VERSION \n更新日志：$MESSAGE"
+    - >
+      curl 'https://oapi.dingtalk.com/robot/send?access_token=784334b948516948bcbf062d811f0d2c18ac7303367daf7fc61afdca917ae234'
+      -H 'Content-Type: application/json'
+      -d '{"msgtype":"text","text":{"content":"'"$MSG"'"}}'
+
+# ******************************************************************************************************
+# ************************************** 生产环境配置 ****************************************************
+# ******************************************************************************************************
+notify-center-prod:
+  stage: deploy
+  tags:
+    - release
+  only:
+    - release/2.0
+  environment:
+    name: production
+  script:
+    - export GIN_MODE=release
+    - export REPLICAS=2
+    - export VERSION=$(git --no-pager log -n 1 --no-merges --pretty=format:"%h" HEAD)
+    - docker stack deploy --compose-file docker-compose.yml --with-registry-auth notify-center
+    - AUTHOR=$(git --no-pager log -n 1 --no-merges --pretty=format:"%an" HEAD)
+    - MESSAGE=$(git --no-pager log -n 1 --no-merges --pretty=format:"%s" HEAD)
+    - MSG="【推送网关V2】\n发布环境：🟢 生产环境 \n节点数：$REPLICAS个 \n发布者：$AUTHOR \n版本hash：$VERSION \n更新日志：$MESSAGE"
+    - >
+      curl 'https://oapi.dingtalk.com/robot/send?access_token=784334b948516948bcbf062d811f0d2c18ac7303367daf7fc61afdca917ae234'
+      -H 'Content-Type: application/json'
+      -d '{"msgtype":"text","text":{"content":"'"$MSG"'"}}'
