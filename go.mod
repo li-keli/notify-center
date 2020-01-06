@@ -9,6 +9,7 @@ require (
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/gorilla/websocket v1.4.0
+	github.com/jinzhu/gorm v1.9.11
 	github.com/satori/go.uuid v1.2.0
 	github.com/sideshow/apns2 v0.20.0
 	github.com/sirupsen/logrus v1.4.2

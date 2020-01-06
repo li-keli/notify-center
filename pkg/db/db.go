@@ -1,59 +1,21 @@
 package db
 
 import (
-	"github.com/globalsign/mgo"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/sirupsen/logrus"
 )
 
-var globalS *mgo.Session
+var conn *gorm.DB
 
-func NewMongo() {
-	var url = "172.16.2.161:21000"
-
-	dialInfo := &mgo.DialInfo{
-		Addrs:  []string{url},
-		Source: "notification_db",
-	}
-	session, err := mgo.DialWithInfo(dialInfo)
+func NewDB() {
+	db, err := gorm.Open("mysql", "root:123@tcp(172.16.2.161:3300)/notify?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		logrus.Fatal("mongodb connection error: ", err, url)
+		logrus.Fatalln("数据库连接失败", err)
 	}
-	session.SetMode(mgo.Monotonic, true)
-	globalS = session
-}
+	logrus.Info("数据库连接成功...")
+	//db.LogMode(true)
+	db.SingularTable(true)
 
-func connect(db, collection string) (*mgo.Session, *mgo.Collection) {
-	s := globalS.Copy()
-	c := s.DB(db).C(collection)
-	return s, c
-}
-
-func Insert(db, collection string, docs ...interface{}) error {
-	ms, c := connect(db, collection)
-	defer ms.Close()
-	return c.Insert(docs...)
-}
-
-func FindOne(db, collection string, query, selector, result interface{}) error {
-	ms, c := connect(db, collection)
-	defer ms.Close()
-	return c.Find(query).Select(selector).One(result)
-}
-
-func FindAll(db, collection string, query, selector, result interface{}) error {
-	ms, c := connect(db, collection)
-	defer ms.Close()
-	return c.Find(query).Select(selector).All(result)
-}
-
-func Update(db, collection string, query, update interface{}) error {
-	ms, c := connect(db, collection)
-	defer ms.Close()
-	return c.Update(query, update)
-}
-
-func Remove(db, collection string, query interface{}) error {
-	ms, c := connect(db, collection)
-	defer ms.Close()
-	return c.Remove(query)
+	conn = db
 }

@@ -7,7 +7,7 @@ var (
 	IOS         PlatformType = 10
 	Android     PlatformType = 20
 	MiniProgram PlatformType = 30
-	WebSocket   PlatformType = 40
+	WebSocket   PlatformType = 40 // discard
 	DingDing    PlatformType = 50
 
 	JsjApp     TargetType = 100
@@ -15,6 +15,7 @@ var (
 	YgApp      TargetType = 300
 	KtgjWxMini TargetType = 400
 	Dingding   TargetType = 500
+	KtNo1      TargetType = 600
 )
 
 // 转换推送的平台类型
@@ -47,6 +48,8 @@ func TargetTypeValueOf(tType TargetType) string {
 		return "空铁管家微信小程序"
 	case Dingding:
 		return "钉钉"
+	case KtNo1:
+		return "空铁1号"
 	}
 	return ""
 }

@@ -12,15 +12,16 @@ import (
 func main() {
 	logrus.Println("run...")
 
-	db.NewMongo()
+	db.NewDB()
 	redis.NewRedisConn()
 
 	engine := gin.Default()
 	engine.GET("/health", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "up")
 	})
-	engine.POST("/v1/terminal/registerKt", v1.RegisterTerminal)
-	engine.POST("/notify", v1.Notify)
+	engine.POST("/v2/terminal/register", v1.RegisterTerminal)
+	engine.POST("/v2/terminal/unRegister", v1.UnRegisterTerminal)
+	engine.POST("/v2/notification/send", v1.Notify)
 
-	_ = engine.Run("localhost:8080")
+	_ = engine.Run("127.0.0.1:8080")
 }

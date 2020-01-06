@@ -13,7 +13,7 @@ func (BaseOutput) Success() BaseOutput {
 	return BaseOutput{
 		BaseHead: BaseHead{
 			Code:    "0000",
-			Message: "",
+			Message: "success",
 		},
 	}
 }
