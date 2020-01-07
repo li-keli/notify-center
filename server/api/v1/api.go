@@ -102,6 +102,12 @@ func Notify(ctx *gin.Context) {
 	}
 	logrus.Infof("获取推送目标数据：%#v", one)
 
+	// 停用微信小程序模板推送
+	if one.PlatformTypeId == constant.MiniProgram {
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success("小程序模板推送暂时下线，按照微信新规停用调整"))
+		return
+	}
+
 	// 获取推送目标平台配置
 	config, err := nConfig.FindOne(one.PlatformTypeId, input.TargetType)
 	if err != nil {
@@ -122,11 +128,12 @@ func Notify(ctx *gin.Context) {
 	})
 
 	// 发起推送
-	if err := logic.BuildPushActuator(input, one, config).PushMessage(one.PushToken); err != nil {
-		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
+	offlinePushActuator := logic.BuildPushActuator(input, one, config)
+	if err := offlinePushActuator.PushMessage(one.PushToken); err != nil {
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(offlinePushActuator.Mode()+"平台推送失败："+err.Error()))
 		return
 	}
 
-	logrus.Info("离线推送成功")
-	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success("离线推送成功"))
+	logrus.Infof("%s平台推送成功", offlinePushActuator.Mode())
+	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(offlinePushActuator.Mode()+"平台推送成功"))
 }

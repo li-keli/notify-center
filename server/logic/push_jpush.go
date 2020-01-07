@@ -13,7 +13,12 @@ type PushJPush struct {
 	config   db.NotifyConfig
 }
 
-func (p PushJPush) PushMessage(pushToken string) error {
+func (p PushJPush) Mode() string {
+	return "Android(极光)推送"
+}
+
+func (p PushJPush) PushMessage(param ...string) error {
+	var pushToken = param[0]
 	config, err := p.config.AndroidConfig()
 	if err != nil {
 		logrus.Error("构造极光推送配置错误", err)

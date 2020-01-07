@@ -6,9 +6,12 @@ import (
 	"notify-center/server/api/v1/vo"
 )
 
-// 推送逻辑
+// 推送
 type PushActuator interface {
-	PushMessage(pushToken string) error
+	// 获取推送模式（APNS、极光）
+	Mode() string
+	// 执行推送
+	PushMessage(param ...string) error
 }
 
 // 构造推送器
@@ -18,8 +21,6 @@ func BuildPushActuator(notifyVo vo.NotifyVo, app db.NotifyRegister, config db.No
 		return PushApns{notifyVo, config}
 	case constant.Android:
 		return PushJPush{notifyVo, config}
-	case constant.DingDing:
-		return nil
 	}
 
 	return nil
