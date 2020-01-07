@@ -32,17 +32,14 @@ func Publish(msg *dto.RedisStreamMessage) {
 
 // 消息订阅
 // {"MAction":"ktNo1.share.qrcode","MBody":"{\"orderNumber\":\"0\",\"opType\":\"1\",\"linkUrl\":\"\",\"title\":\"分享消息\",\"message\":\"扫描成功\",\"jsjUniqueId\":\"20613128\"}"}
-func Subscribe(handle func(m *dto.RedisStreamMessage)) {
+func Subscribe(handle func(s string)) {
 	pubSub := client.Subscribe("notify/comet")
 	if _, e := pubSub.Receive(); e != nil {
 		logrus.Fatal("redis服务订阅失败")
 	}
 	channel := pubSub.Channel()
 	for msg := range channel {
-		logrus.Info("收到消息 ", msg.Payload)
-		var msgObj = dto.RedisStreamMessage{}
-		_ = msgObj.UnMarshal([]byte(msg.Pattern))
-		handle(&msgObj)
+		handle(msg.Payload)
 	}
 }
 

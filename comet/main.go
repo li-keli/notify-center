@@ -37,7 +37,11 @@ func main() {
 	redis.NewRedisConn()
 
 	// redis 订阅发布
-	go redis.Subscribe(func(msg *dto.RedisStreamMessage) {
+	go redis.Subscribe(func(s string) {
+		logrus.Infof("收到消息 %s", s)
+		msg, _ := dto.RedisStreamMessage{}.UnMarshal([]byte(s))
+		logrus.Infof("UniqueId: %s ; Body: %s", msg.UniqueId, string(msg.Body.Marshal()))
+
 		connList.Each(func(index int, value interface{}) {
 			targetConn := value.(*ConnStruct)
 			if targetConn.Key == msg.UniqueId {

@@ -23,8 +23,8 @@ func (rsm *RedisStreamMessage) Marshal() string {
 	return string(bytes)
 }
 
-func (rsm *RedisStreamMessage) UnMarshal(b []byte) (e error) {
-	e = json.Unmarshal(b, &rsm)
+func (RedisStreamMessage) UnMarshal(b []byte) (r RedisStreamMessage, e error) {
+	e = json.Unmarshal(b, &r)
 	return
 }
 
