@@ -20,7 +20,7 @@ Welcome<br/>
     //判断当前浏览器是否支持WebSocket
     if ('WebSocket' in window) {
         // websocket = new WebSocket("wss://openservice.dev.jsjinfo.cn/notification-comet/v1/ws/600/2059797");
-        websocket = new WebSocket("ws://localhost:32772/v1/ws/600/2059797");
+        websocket = new WebSocket("ws://localhost:8080/v1/ws/600/2059797");
     } else {
         alert('Not support websocket')
     }

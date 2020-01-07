@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile
     image: docker.jsjit.cn/middleware-team/notify-center-comet:v2
     ports:
-      - 20606:8081
+      - 20606:8080
     networks:
       - redis-db
     depends_on:

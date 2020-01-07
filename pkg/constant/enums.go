@@ -6,7 +6,7 @@ type TargetType int
 var (
 	IOS         PlatformType = 10
 	Android     PlatformType = 20
-	MiniProgram PlatformType = 30
+	MiniProgram PlatformType = 30 // discard
 	WebSocket   PlatformType = 40 // discard
 	DingDing    PlatformType = 50
 

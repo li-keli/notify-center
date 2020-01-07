@@ -6,6 +6,7 @@ import (
 	"github.com/sideshow/apns2/certificate"
 	"github.com/sideshow/apns2/payload"
 	"github.com/sirupsen/logrus"
+	"notify-center/pkg/constant"
 	"notify-center/pkg/db"
 	"notify-center/server/api/v1/vo"
 )
@@ -17,7 +18,7 @@ type PushApns struct {
 }
 
 func (p PushApns) Mode() string {
-	return "APNS推送"
+	return "IOS平台"
 }
 
 func (p PushApns) PushMessage(param ...string) error {
@@ -45,14 +46,22 @@ func (p PushApns) PushMessage(param ...string) error {
 	notification.DeviceToken = pushToken
 	notification.Topic = config.BundleId
 	notification.Payload = pload
-	client := apns2.NewClient(cert).Production()
+
+	client := apns2.NewClient(cert)
+	// 环境区分
+	if constant.ProductionMode {
+		client.Production()
+	} else {
+		client.Development()
+	}
+
 	res, err := client.Push(notification)
 	if err != nil {
-		logrus.Errorf("Apns推送错误，%s %s %s %s", res.Reason, pushToken, config.P12Path, config.BundleId)
+		logrus.Errorf("Apns推送错误，%s %s %s %s %s", err.Error(), client.Host, pushToken, config.P12Path, config.BundleId)
 		return err
 	}
 	if res.StatusCode != 200 {
-		logrus.Errorf("Apns推送失败，错误码：%d %s %s %s %s", res.StatusCode, res.Reason, pushToken, config.P12Path, config.BundleId)
+		logrus.Errorf("Apns推送失败，错误码：%d %s %s %s %s %s", res.StatusCode, client.Host, res.Reason, pushToken, config.P12Path, config.BundleId)
 		return errors.New(res.Reason)
 	}
 

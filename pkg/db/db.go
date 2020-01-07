@@ -13,7 +13,7 @@ func NewDB() {
 	if err != nil {
 		logrus.Fatalln("数据库连接失败", err)
 	}
-	logrus.Info("数据库连接成功...")
+	logrus.Info("MySql连接成功...")
 	//db.LogMode(true)
 	db.SingularTable(true)
 

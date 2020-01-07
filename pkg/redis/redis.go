@@ -19,6 +19,7 @@ func NewRedisConn() {
 	if _, e := client.Ping().Result(); e != nil {
 		logrus.Info(e)
 	}
+	logrus.Info("Redis连接成功...")
 }
 
 // 消息发布

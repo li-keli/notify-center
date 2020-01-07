@@ -3,7 +3,6 @@ package db
 
 import (
 	"encoding/json"
-	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"notify-center/pkg/constant"
 	"time"
@@ -39,10 +38,10 @@ func (n NotifyConfig) IosConfig() (config IosConfig, err error) {
 		logrus.Error("序列化IosConfig错误，原文：", n.ConfigData)
 		return
 	}
-	if gin.Mode() == "debug" {
-		config.P12Path = config.P12DevPath
-	} else {
+	if constant.ProductionMode {
 		config.P12Path = config.P12ProdPath
+	} else {
+		config.P12Path = config.P12DevPath
 	}
 	return
 }

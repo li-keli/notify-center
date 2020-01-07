@@ -14,7 +14,7 @@ type PushJPush struct {
 }
 
 func (p PushJPush) Mode() string {
-	return "Android(极光)推送"
+	return "Android平台"
 }
 
 func (p PushJPush) PushMessage(param ...string) error {

@@ -41,34 +41,18 @@ func main() {
 		connList.Each(func(index int, value interface{}) {
 			targetConn := value.(*ConnStruct)
 			if targetConn.Key == msg.UniqueId {
-				logrus.Infof("处理广播消息 %s", targetConn.Key)
-				if e := targetConn.Conn.WriteMessage(1, []byte(msg.Body.Marshal())); e != nil {
-					redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
-				}
+				go func() {
+					logrus.Infof("处理广播消息 %s", targetConn.Key)
+					if e := targetConn.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Body.Marshal())); e != nil {
+						redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
+					}
+				}()
 			}
 		})
 	})
 
 	engine := gin.Default()
-	engine.GET("/health/:uniqueId", func(c *gin.Context) {
-		logrus.Info("会话列表容量", connList.Size())
-		var uniqueId, _ = strconv.Atoi(c.Param("uniqueId"))
-		_, obj := connList.Find(func(index int, value interface{}) bool {
-			stru, b := value.(*ConnStruct)
-			if !b {
-				return false
-			}
-			if stru.Key == uniqueId {
-				return true
-			}
-			return false
-		})
-		connStruct := obj.(*ConnStruct)
-		_ = connStruct.Conn.WriteMessage(1, []byte("hello"))
-
-		c.String(http.StatusOK, string(connList.Size()))
-	})
-	engine.GET("/v1/ws/:targetType/:uniqueId", func(c *gin.Context) {
+	engine.GET("/v2/ws/:targetType/:uniqueId", func(c *gin.Context) {
 		var (
 			targetType, _ = strconv.Atoi(c.Param("targetType"))
 			uniqueId, _   = strconv.Atoi(c.Param("uniqueId"))
@@ -95,6 +79,7 @@ func main() {
 			ws.Close()
 			connList.Remove(connList.IndexOf(connModule))
 			redis.DelHashField(strconv.Itoa(uniqueId), sId)
+			logrus.Infof("WS连接数：%d", connList.Size())
 		}()
 
 		for {
@@ -116,5 +101,5 @@ func main() {
 		}
 	})
 
-	_ = engine.Run(":8080")
+	_ = engine.Run()
 }
