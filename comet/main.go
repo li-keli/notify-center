@@ -43,7 +43,7 @@ func main() {
 			if targetConn.Key == msg.UniqueId {
 				go func() {
 					logrus.Infof("处理广播消息 %s", targetConn.Key)
-					if e := targetConn.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Body.Marshal())); e != nil {
+					if e := targetConn.Conn.WriteMessage(websocket.TextMessage, msg.Body.Marshal()); e != nil {
 						redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
 					}
 				}()
