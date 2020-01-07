@@ -15,7 +15,7 @@ project-build:
     - export REPLICAS=1
     - export VERSION=$(git --no-pager log -n 1 --no-merges --pretty=format:"%h" HEAD)
     - docker-compose build
-    - docker-compose push
+#    - docker-compose push
 
 # ******************************************************************************************************
 # ************************************** 测试环境配置 ****************************************************
