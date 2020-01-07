@@ -31,17 +31,17 @@ func Publish(msg *dto.RedisStreamMessage) {
 }
 
 // 消息订阅
-func Subscribe(handle func(m *dto.RedisStreamMessage)) {
+func Subscribe(handle func(id int, body string)) {
 	pubSub := client.Subscribe("notify/comet")
 	if _, e := pubSub.Receive(); e != nil {
 		logrus.Fatal("redis服务订阅失败")
 	}
 	channel := pubSub.Channel()
 	for msg := range channel {
-		var msgObj = dto.RedisStreamMessage{}
 		logrus.Info("收到消息 ", msg.Payload)
+		var msgObj = dto.RedisStreamMessage{}
 		_ = msgObj.UnMarshal([]byte(msg.Payload))
-		handle(&msgObj)
+		handle(msgObj.UniqueId, msg.Payload)
 	}
 }
 
