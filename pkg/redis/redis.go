@@ -12,7 +12,7 @@ var client *redis.Client
 
 func NewRedisConn() {
 	client = redis.NewClient(&redis.Options{
-		Addr:     "172.16.7.20:6379",
+		Addr:     "redis:6379", // 172.16.7.20:6379
 		Password: "",
 		DB:       3,
 	})
@@ -25,14 +25,14 @@ func NewRedisConn() {
 // 消息发布
 func Publish(msg *dto.RedisStreamMessage) {
 	s := msg.Marshal()
-	if err := client.Publish("homework", s).Err(); err != nil {
+	if err := client.Publish("notify/comet", s).Err(); err != nil {
 		logrus.Error("redis消息发布异常", err)
 	}
 }
 
 // 消息订阅
-func Subscribe(handle func(msg *dto.RedisStreamMessage)) {
-	pubSub := client.Subscribe("homework")
+func Subscribe(handle func(m *dto.RedisStreamMessage)) {
+	pubSub := client.Subscribe("notify/comet")
 	if _, e := pubSub.Receive(); e != nil {
 		logrus.Fatal("redis服务订阅失败")
 	}

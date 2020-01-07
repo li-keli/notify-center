@@ -41,12 +41,10 @@ func main() {
 		connList.Each(func(index int, value interface{}) {
 			targetConn := value.(*ConnStruct)
 			if targetConn.Key == msg.UniqueId {
-				go func() {
-					logrus.Infof("处理广播消息 %s", targetConn.Key)
-					if e := targetConn.Conn.WriteMessage(websocket.TextMessage, msg.Body.Marshal()); e != nil {
-						redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
-					}
-				}()
+				logrus.Infof("处理广播消息 %d; %s", targetConn.Key)
+				if e := targetConn.Conn.WriteMessage(websocket.TextMessage, msg.Body.Marshal()); e != nil {
+					redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
+				}
 			}
 		})
 	})
