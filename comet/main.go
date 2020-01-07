@@ -52,7 +52,7 @@ func main() {
 	})
 
 	engine := gin.Default()
-	engine.GET("/v2/ws/:targetType/:uniqueId", func(c *gin.Context) {
+	engine.GET("/v1/ws/:targetType/:uniqueId", func(c *gin.Context) {
 		var (
 			targetType, _ = strconv.Atoi(c.Param("targetType"))
 			uniqueId, _   = strconv.Atoi(c.Param("uniqueId"))
