@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"notify-center/pkg/constant"
+	"notify-center/pkg/dto"
 	"notify-center/pkg/redis"
 	"strconv"
 )
@@ -36,13 +37,13 @@ func main() {
 	redis.NewRedisConn()
 
 	// redis 订阅发布
-	go redis.Subscribe(func(id int, body string) {
+	go redis.Subscribe(func(msg *dto.RedisStreamMessage) {
 		connList.Each(func(index int, value interface{}) {
 			targetConn := value.(*ConnStruct)
-			if targetConn.Key == id {
-				logrus.Infof("处理广播消息 %d; %s", targetConn.Key, body)
-				if e := targetConn.Conn.WriteMessage(websocket.TextMessage, []byte(body)); e != nil {
-					redis.DelHashField(strconv.Itoa(id), targetConn.Sid)
+			if targetConn.Key == msg.UniqueId {
+				logrus.Infof("处理广播消息 %d; %s", targetConn.Key, string(msg.Body.Marshal()))
+				if e := targetConn.Conn.WriteMessage(websocket.TextMessage, msg.Body.Marshal()); e != nil {
+					redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
 				}
 			}
 		})
