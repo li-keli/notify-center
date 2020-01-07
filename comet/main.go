@@ -41,7 +41,7 @@ func main() {
 		connList.Each(func(index int, value interface{}) {
 			targetConn := value.(*ConnStruct)
 			if targetConn.Key == msg.UniqueId {
-				logrus.Infof("处理广播消息 %d; %s", targetConn.Key)
+				logrus.Infof("处理广播消息 %d; %s", targetConn.Key, string(msg.Body.Marshal()))
 				if e := targetConn.Conn.WriteMessage(websocket.TextMessage, msg.Body.Marshal()); e != nil {
 					redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
 				}
