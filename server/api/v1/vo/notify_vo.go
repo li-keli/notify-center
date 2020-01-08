@@ -6,12 +6,12 @@ import (
 )
 
 type NotifyVo struct {
-	JsjUniqueId int                    `json:"JsjUniqueId"`
-	TargetType  constant.TargetType    `json:"TargetType"`
-	Title       string                 `json:"Title"`
-	Message     string                 `json:"Message"`
-	Route       string                 `json:"Route"`
-	Data        map[string]interface{} `json:"Data"`
+	JsjUniqueId int                 `json:"JsjUniqueId"`
+	TargetType  constant.TargetType `json:"TargetType"`
+	Title       string              `json:"Title"`
+	Message     string              `json:"Message"`
+	Route       string              `json:"Route"`
+	Data        map[string]string   `json:"Data"`
 
 	// 以下字段废弃
 	// ReadSendTime string                 `json:"ReadSendTime"`
