@@ -17,7 +17,7 @@ func NewRedisConn() {
 		DB:       3,
 	})
 	if _, e := client.Ping().Result(); e != nil {
-		logrus.Fatal("Redis连接失败", e)
+		logrus.Fatal("Redis连接失败: ", e.Error())
 	}
 	logrus.Info("Redis连接成功...")
 }
