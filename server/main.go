@@ -14,12 +14,8 @@ func main() {
 	redis.NewRedisConn()
 
 	engine := gin.Default()
-	engine.GET("/health", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "up")
-	})
-	engine.POST("/v1/terminal/register", v1.RegisterTerminal)
-	engine.POST("/v1/terminal/unRegister", v1.UnRegisterTerminal)
-	engine.POST("/v1/notification/send", v1.Notify)
+	engine.GET("/health", func(ctx *gin.Context) { ctx.String(http.StatusOK, "up") })
+	v1.RegisterNotify(engine)
 
 	_ = engine.Run()
 }

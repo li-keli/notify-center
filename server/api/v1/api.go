@@ -13,9 +13,16 @@ import (
 	"time"
 )
 
+func RegisterNotify(engine *gin.Engine) {
+	engine.POST("/v1/terminal/register", TerminalRegister)
+	engine.POST("/v1/terminal/unRegister", TerminalUnRegister)
+	engine.POST("/v1/notification/send", Notify)
+	engine.POST("/v1/msg", MessageList)
+}
+
 // 注册终端
-func RegisterTerminal(ctx *gin.Context) {
-	var input vo.RegisterTerminalVo
+func TerminalRegister(ctx *gin.Context) {
+	var input vo.RegisterTerminalInputVo
 
 	if err := ctx.BindJSON(&input); err != nil {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
@@ -52,8 +59,8 @@ func RegisterTerminal(ctx *gin.Context) {
 }
 
 // 注销终端
-func UnRegisterTerminal(ctx *gin.Context) {
-	var input vo.UnRegisterTerminalVo
+func TerminalUnRegister(ctx *gin.Context) {
+	var input vo.UnRegisterTerminalInputVo
 
 	if err := ctx.BindJSON(&input); err != nil {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
@@ -124,7 +131,6 @@ func Notify(ctx *gin.Context) {
 		TargetTypeId:     input.TargetType,
 		TargetTypeName:   constant.TargetTypeValueOf(input.TargetType),
 		DataContent:      input.DataToStr(),
-		CreateTime:       time.Now(),
 	})
 
 	// 发起推送
@@ -136,4 +142,27 @@ func Notify(ctx *gin.Context) {
 
 	logrus.Infof("%s平台推送成功", offlinePushActuator.Mode())
 	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(offlinePushActuator.Mode()+"平台推送成功"))
+}
+
+// 消息列表
+func MessageList(ctx *gin.Context) {
+	var (
+		input vo.MsgListInputVo
+	)
+
+	if err := ctx.BindJSON(&input); err != nil {
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
+		return
+	}
+	logrus.Info("请求数据：", input)
+
+	all, err := db.NotifyMsg{}.FindAll(input.PushToken, input.StartTime, input.EntTime, input.Limit)
+	if err != nil {
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
+		return
+	}
+	ctx.JSON(http.StatusOK, vo.MsgListOutputVo{
+		BaseOutput: vo.BaseOutput{}.Success(""),
+		Msg:        all,
+	})
 }
