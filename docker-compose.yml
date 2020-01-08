@@ -1,19 +1,6 @@
 version: "3.7"
 
 services:
-  redis:
-    image: redis:4.0.10
-    ports:
-      - 20605:6379
-    networks:
-      - redis-db
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      resources:
-        limits:
-          memory: 1024M
   websocket:
     build:
       context: ./comet
@@ -21,10 +8,6 @@ services:
     image: docker.jsjit.cn/middleware-team/notify-center-comet:v2-${VERSION}
     ports:
       - 20606:8080
-    networks:
-      - redis-db
-    depends_on:
-      - redis
     environment:
       GIN_MODE: release
     deploy:
@@ -44,11 +27,6 @@ services:
     image: docker.jsjit.cn/middleware-team/notify-center-server:v2-${VERSION}
     ports:
       - 20607:8080
-    networks:
-      - redis-db
-    depends_on:
-      - redis
-      - websocket
     environment:
       GIN_MODE: release
     deploy:
@@ -61,5 +39,3 @@ services:
       resources:
         limits:
           memory: 1024M
-networks:
-  redis-db:
