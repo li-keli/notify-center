@@ -44,7 +44,7 @@ func (p PushJPush) PushMessage(param ...string) error {
 	var msg jpushclient.Message
 	msg.Title = p.notifyVo.Title
 	msg.Content = p.notifyVo.Message
-	//msg.Extras = p.notifyVo.Data
+	msg.Extras = p.notifyVo.Data
 
 	payload := jpushclient.NewPushPayLoad()
 	payload.SetPlatform(&pf)
