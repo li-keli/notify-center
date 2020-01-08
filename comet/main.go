@@ -40,13 +40,13 @@ func main() {
 	go redis.Subscribe(func(s string) {
 		logrus.Infof("收到消息 %s", s)
 		msg, _ := dto.RedisStreamMessage{}.UnMarshal([]byte(s))
-		logrus.Infof("UniqueId: %s ; Body: %s", msg.UniqueId, string(msg.Body.Marshal()))
+		logrus.Infof("UniqueId: %s ; Body: %s", msg.UniqueId, msg.Body)
 
 		connList.Each(func(index int, value interface{}) {
 			targetConn := value.(*ConnStruct)
 			if targetConn.Key == msg.UniqueId {
-				logrus.Infof("处理广播消息 %d; %s", targetConn.Key, string(msg.Body.Marshal()))
-				if e := targetConn.Conn.WriteMessage(websocket.TextMessage, msg.Body.Marshal()); e != nil {
+				logrus.Infof("处理广播消息 %d; %s", targetConn.Key, msg.Body)
+				if e := targetConn.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Body)); e != nil {
 					redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
 				}
 			}

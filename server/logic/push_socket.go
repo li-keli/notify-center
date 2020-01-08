@@ -17,10 +17,7 @@ func (p PushWSocket) PushMessage() error {
 	// 发送WS广播
 	redis.Publish(&dto.RedisStreamMessage{
 		UniqueId: p.NotifyVo.JsjUniqueId,
-		Body: dto.RedisStreamMessageBody{
-			MAction: p.NotifyVo.Route,
-			MBody:   string(marshal),
-		},
+		Body:     string(marshal),
 	})
 
 	return e
