@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     image: docker.jsjit.cn/middleware-team/notify-center-comet:v2-${VERSION}
     ports:
-      - 20606:8080
+      - 20606:8081
     environment:
       GIN_MODE: ${GIN_MODE}
     deploy:
