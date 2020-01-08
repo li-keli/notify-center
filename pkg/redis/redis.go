@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
+	"notify-center/pkg/constant"
 	"notify-center/pkg/dto"
 	"time"
 )
@@ -11,8 +12,14 @@ import (
 var client *redis.Client
 
 func NewRedisConn() {
+	var addr string
+	if constant.ProductionMode {
+		addr = "172.16.2.163:6379"
+	} else {
+		addr = "172.16.2.162:6379"
+	}
 	client = redis.NewClient(&redis.Options{
-		Addr:     "172.16.2.162:6379", // 172.16.7.20
+		Addr:     addr,
 		Password: "",
 		DB:       3,
 	})

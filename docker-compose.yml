@@ -9,7 +9,7 @@ services:
     ports:
       - 20606:8080
     environment:
-      GIN_MODE: release
+      GIN_MODE: ${GIN_MODE}
     deploy:
       replicas: 1
       update_config:
@@ -28,7 +28,7 @@ services:
     ports:
       - 20607:8080
     environment:
-      GIN_MODE: release
+      GIN_MODE: ${GIN_MODE}
     deploy:
       replicas: 1
       update_config:
