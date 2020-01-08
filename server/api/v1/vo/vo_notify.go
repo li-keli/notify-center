@@ -10,6 +10,7 @@ type NotifyVo struct {
 	TargetType  constant.TargetType    `json:"TargetType"`
 	Title       string                 `json:"Title"`
 	Message     string                 `json:"Message"`
+	GroupName   string                 `json:"GroupName"`
 	Route       string                 `json:"Route"`
 	Data        map[string]interface{} `json:"Data"`
 

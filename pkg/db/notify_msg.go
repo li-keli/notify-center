@@ -14,6 +14,7 @@ type NotifyMsg struct {
 	PlatformTypeName string                `json:"PlatformTypeName" gorm:"column:platform_type_name"`
 	TargetTypeId     constant.TargetType   `json:"TargetTypeId" gorm:"column:target_type_id"`
 	TargetTypeName   string                `json:"TargetTypeName" gorm:"column:target_type_name"`
+	GroupName        string                `json:"GroupName" gorm:"column:group_name"`
 	CreateTime       time.Time             `json:"CreateTime" gorm:"column:create_time"`
 }
 

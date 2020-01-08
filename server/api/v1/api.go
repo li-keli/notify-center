@@ -131,6 +131,7 @@ func Notify(ctx *gin.Context) {
 		TargetTypeId:     input.TargetType,
 		TargetTypeName:   constant.TargetTypeValueOf(input.TargetType),
 		DataContent:      input.DataToStr(),
+		GroupName:        input.GroupName,
 	})
 
 	// 发起推送
