@@ -7,6 +7,7 @@ type MsgListInputVo struct {
 	StartTime string `json:"StartTime"`
 	EntTime   string `json:"EntTime"`
 	Limit     int    `json:"Limit"`
+	Offset    int    `json:"Offset"`
 }
 
 type MsgListOutputVo struct {
