@@ -65,5 +65,6 @@ func (p PushApns) PushMessage(param ...string) error {
 		return errors.New(res.Reason)
 	}
 
+	logrus.Infof("Apns推送成功 %s %s %s %s", client.Host, pushToken, config.P12Path, config.BundleId)
 	return err
 }
