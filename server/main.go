@@ -1,3 +1,4 @@
+// 推送处理器，集成WebSocket、Apns、极光实现多方的推送
 package main
 
 import (

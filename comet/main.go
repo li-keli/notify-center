@@ -1,3 +1,5 @@
+// WebSocket连接端点，无状态可复数部署
+// 通过Redis订阅发布实现负载
 package main
 
 import (
