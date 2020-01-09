@@ -77,7 +77,7 @@ func main() {
 
 		connList.Add(connModule)
 		connModuleBytes, _ := json.Marshal(connModule)
-		redis.SetHash(strconv.Itoa(uniqueId), sId, connModuleBytes, 10)
+		redis.SetHash(strconv.Itoa(uniqueId), sId, connModuleBytes, 30)
 		logrus.Infof("WS连接数：%d", connList.Size())
 		defer func() {
 			ws.Close()
@@ -95,7 +95,7 @@ func main() {
 
 			if string(message) == "+" {
 				message = []byte("-")
-				redis.SetHash(strconv.Itoa(uniqueId), sId, connModuleBytes, 10)
+				redis.SetHash(strconv.Itoa(uniqueId), sId, connModuleBytes, 30)
 			}
 			//写入ws数据
 			err = ws.WriteMessage(mt, message)
