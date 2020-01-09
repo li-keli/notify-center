@@ -177,7 +177,7 @@ func WeChatRegister(ctx *gin.Context) {
 		CreateTime:  time.Now(),
 	})
 	if err != nil {
-		trackLog.Error("")
+		trackLog.Error("微信小程序订阅消息注册错误", err.Error())
 	}
 }
 

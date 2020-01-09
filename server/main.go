@@ -15,7 +15,7 @@ func main() {
 	redis.NewRedisConn()
 
 	engine := gin.Default()
-	engine.GET("/health", func(ctx *gin.Context) { ctx.String(http.StatusOK, "up") })
+	engine.GET("/actuator/health", func(ctx *gin.Context) { ctx.String(http.StatusOK, "up") })
 	v1.RegisterNotify(engine, track_log.UseLogMiddle)
 
 	_ = engine.Run()
