@@ -14,7 +14,7 @@ func NewDB() {
 		logrus.Fatalln("数据库连接失败", err)
 	}
 	logrus.Info("MySql连接成功...")
-	//db.LogMode(true)
+	db.LogMode(true)
 	db.SingularTable(true)
 
 	conn = db

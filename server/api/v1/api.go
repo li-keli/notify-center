@@ -118,7 +118,7 @@ func Notify(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error("未发现终端注册信息"))
 		return
 	}
-	trackLog.Infof("获取推送目标数据：%#v", one)
+	trackLog.Info("推送设备注册数据：", one)
 
 	// 停用微信小程序模板推送
 	if one.PlatformTypeId == constant.MiniProgram {
@@ -132,10 +132,11 @@ func Notify(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error("未发现接收平台配置信息"))
 		return
 	}
-	trackLog.Infof("获取推送目标平台配置：%#v", config)
+	trackLog.Info("推送平台配置：", config)
 
 	// 记录推送数据
 	nMessage.Insert(db.NotifyMsg{
+		JsjUniqueId:      one.JsjUniqueId,
 		PushToken:        one.PushToken,
 		PlatformTypeId:   one.PlatformTypeId,
 		PlatformTypeName: one.PlatformTypeName,
@@ -164,13 +165,18 @@ func MessageList(ctx *gin.Context) {
 		trackLog = track_log.Logger(ctx)
 	)
 
-	if err := ctx.BindJSON(&input); err != nil {
+	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		return
 	}
 	trackLog.Info("请求数据：", input)
 
-	all, err := db.NotifyMsg{}.FindAll(input.PushToken, input.StartTime, input.EntTime, input.Offset, input.Limit)
+	if input.JsjUniqueId == 0 && input.PushToken == "" {
+		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error("JsjUniqueId和PushToken不能同时为空"))
+		return
+	}
+
+	all, err := db.NotifyMsg{}.FindAll(input.JsjUniqueId, input.PushToken, input.Offset, input.Limit)
 	if err != nil {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		return

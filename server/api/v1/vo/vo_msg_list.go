@@ -3,11 +3,10 @@ package vo
 import "notify-center/pkg/db"
 
 type MsgListInputVo struct {
-	PushToken string `json:"PushToken"`
-	StartTime string `json:"StartTime"`
-	EntTime   string `json:"EntTime"`
-	Limit     int    `json:"Limit"`
-	Offset    int    `json:"Offset"`
+	JsjUniqueId int    `json:"JsjUniqueId"`
+	PushToken   string `json:"PushToken"`
+	Offset      int    `json:"Offset" binding:"min=1"`
+	Limit       int    `json:"Limit" binding:"max=20"`
 }
 
 type MsgListOutputVo struct {
