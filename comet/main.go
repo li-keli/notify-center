@@ -8,10 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	uuid "github.com/satori/go.uuid"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"notify-center/pkg/constant"
 	"notify-center/pkg/redis"
+	"notify-center/pkg/track_log"
 	"strconv"
 )
 
@@ -39,14 +39,11 @@ func main() {
 
 	// redis 订阅发布
 	go redis.Subscribe(func(s string) {
-		logrus.Infof("收到消息 %s", s)
 		msg, _ := redis.StreamMessage{}.UnMarshal([]byte(s))
-		logrus.Infof("UniqueId: %d; Body: %s", msg.UniqueId, string(msg.Body.Marshal()))
-
 		connList.Each(func(index int, value interface{}) {
 			targetConn := value.(*ConnStruct)
 			if targetConn.Key == msg.UniqueId {
-				logrus.Infof("处理广播消息 %d; %s", targetConn.Key, string(msg.Body.Marshal()))
+				//logrus.Infof("处理广播消息 %d; %s", targetConn.Key, string(msg.Body.Marshal()))
 				if e := targetConn.Conn.WriteMessage(websocket.TextMessage, msg.Body.Marshal()); e != nil {
 					redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
 				}
@@ -55,12 +52,12 @@ func main() {
 	})
 
 	engine := gin.Default()
-	engine.GET("/v1/ws/:targetType/:uniqueId", func(c *gin.Context) {
+	engine.GET("/v1/ws/:targetType/:uniqueId", track_log.UseLogMiddle, func(ctx *gin.Context) {
 		var (
-			targetType, _ = strconv.Atoi(c.Param("targetType"))
-			uniqueId, _   = strconv.Atoi(c.Param("uniqueId"))
+			targetType, _ = strconv.Atoi(ctx.Param("targetType"))
+			uniqueId, _   = strconv.Atoi(ctx.Param("uniqueId"))
 			sId           = uuid.NewV4().String()
-			ws, err       = upgrade.Upgrade(c.Writer, c.Request, nil)
+			ws, err       = upgrade.Upgrade(ctx.Writer, ctx.Request, nil)
 			connModule    = &ConnStruct{
 				Key:   uniqueId,
 				Sid:   sId,
@@ -68,6 +65,8 @@ func main() {
 				TName: constant.TargetTypeValueOf(constant.TargetType(targetType)),
 				Conn:  ws,
 			}
+
+			trackLog = track_log.Logger(ctx)
 		)
 
 		if err != nil {
@@ -77,12 +76,12 @@ func main() {
 		connList.Add(connModule)
 		connModuleBytes, _ := json.Marshal(connModule)
 		redis.SetHash(strconv.Itoa(uniqueId), sId, connModuleBytes, 30)
-		logrus.Infof("WS连接数：%d", connList.Size())
+		trackLog.Infof("WS连接数：%d", connList.Size())
 		defer func() {
 			ws.Close()
 			connList.Remove(connList.IndexOf(connModule))
 			redis.DelHashField(strconv.Itoa(uniqueId), sId)
-			logrus.Infof("WS连接数：%d", connList.Size())
+			trackLog.Infof("WS连接数：%d", connList.Size())
 		}()
 
 		for {
