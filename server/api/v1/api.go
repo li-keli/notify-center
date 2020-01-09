@@ -105,7 +105,11 @@ func Notify(ctx *gin.Context) {
 		if err == nil {
 			ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success("Socket推送成功"))
 			return
+		} else {
+			trackLog.Warn("WebSocket实时推送失败")
 		}
+	} else {
+		trackLog.Warn("WebSocket通道不存在")
 	}
 
 	// 获取推送目标的数据
