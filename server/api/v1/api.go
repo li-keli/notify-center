@@ -13,11 +13,21 @@ import (
 	"time"
 )
 
-func RegisterNotify(engine *gin.Engine) {
-	engine.POST("/v1/terminal/register", TerminalRegister)
-	engine.POST("/v1/terminal/unRegister", TerminalUnRegister)
-	engine.POST("/v1/notification/send", Notify)
-	engine.POST("/v1/msg", MessageList)
+func RegisterNotify(engine *gin.Engine, logMiddle func(ctx *gin.Context)) {
+	v1 := engine.Group(`/v1`, logMiddle)
+	{
+		// 注册
+		v1.POST("/terminal/register", TerminalRegister)
+		v1.POST("/terminal/unRegister", TerminalUnRegister)
+		v1.POST(`/wechat/register`, WeChatRegister)
+
+		// 下发通知
+		v1.POST(`/wechat/send`, WeChatNotify)
+		v1.POST("/notification/send", Notify)
+
+		// 获取历史消息
+		v1.POST("/msg", MessageList)
+	}
 }
 
 // 注册终端
@@ -57,8 +67,6 @@ func TerminalRegister(ctx *gin.Context) {
 			trackLog.Panic("终端注册入库异常", err)
 		}
 	}
-
-	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(""))
 }
 
 // 注销终端
@@ -79,8 +87,6 @@ func TerminalUnRegister(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		trackLog.Panic("终端注销异常")
 	}
-
-	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(""))
 }
 
 // 发送推送消息
@@ -156,6 +162,35 @@ func Notify(ctx *gin.Context) {
 
 	trackLog.Infof("%s平台推送成功", offlinePushActuator.Mode())
 	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(offlinePushActuator.Mode()+"平台推送成功"))
+}
+
+// 微信小程序订阅消息注册
+func WeChatRegister(ctx *gin.Context) {
+	var (
+		input    vo.RegisterWeChatInputVo
+		trackLog = track_log.Logger(ctx)
+	)
+
+	err := db.NotifyRegisterWeChat{}.Insert(db.NotifyRegisterWeChat{
+		JsjUniqueId: input.JsjUniqueId,
+		PushToken:   input.PushToken,
+		CreateTime:  time.Now(),
+	})
+	if err != nil {
+		trackLog.Error("")
+	}
+}
+
+// 微信小程序订阅消息下发
+func WeChatNotify(ctx *gin.Context) {
+	//var (
+	//	input     vo.NotifyVo
+	//	nConfig   db.NotifyConfig
+	//	nRegister db.NotifyRegister
+	//	nMessage  db.NotifyMsg
+	//
+	//	trackLog = track_log.Logger(ctx)
+	//)
 }
 
 // 消息列表

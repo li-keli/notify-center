@@ -6,6 +6,8 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/sohlich/elogrus.v3"
+	"net/http"
+	"notify-center/server/api/v1/vo"
 )
 
 const (
@@ -14,11 +16,10 @@ const (
 	esIndex = "mylog"
 )
 
-func UseLogMiddle(engine *gin.Engine) {
-	engine.Use(func(ctx *gin.Context) {
-		Logger(ctx)
-		ctx.Next()
-	})
+func UseLogMiddle(ctx *gin.Context) {
+	Logger(ctx)
+	ctx.Next()
+	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(""))
 }
 
 // 获取日志对象
