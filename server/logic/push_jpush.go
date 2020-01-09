@@ -37,7 +37,7 @@ func (p PushJPush) PushMessage(param ...string) error {
 		Alert: p.notifyVo.Title,
 		Extras: map[string]interface{}{
 			"MAction": p.notifyVo.Route,
-			"MBody":   string(p.notifyVo.DataToBytes()),
+			"MBody":   p.notifyVo.DataToStr(),
 		}},
 	)
 

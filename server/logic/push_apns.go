@@ -40,7 +40,7 @@ func (p PushApns) PushMessage(param ...string) error {
 	pload.AlertTitle(p.notifyVo.Title)
 	pload.AlertBody(p.notifyVo.Message)
 	pload.Custom("MAction", p.notifyVo.Route)
-	pload.Custom("MBody", p.notifyVo.DataToBytes())
+	pload.Custom("MBody", p.notifyVo.DataToStr())
 
 	notification := &apns2.Notification{}
 	notification.DeviceToken = pushToken
