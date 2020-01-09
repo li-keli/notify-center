@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	jpushclient "github.com/ylywyn/jpush-api-go-client"
 	"notify-center/pkg/db"
@@ -9,6 +10,7 @@ import (
 
 // Android JPush推送
 type PushJPush struct {
+	ctx      *gin.Context
 	notifyVo vo.NotifyVo
 	config   db.NotifyConfig
 }

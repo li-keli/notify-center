@@ -11,7 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"notify-center/pkg/constant"
-	"notify-center/pkg/dto"
 	"notify-center/pkg/redis"
 	"strconv"
 )
@@ -41,7 +40,7 @@ func main() {
 	// redis 订阅发布
 	go redis.Subscribe(func(s string) {
 		logrus.Infof("收到消息 %s", s)
-		msg, _ := dto.RedisStreamMessage{}.UnMarshal([]byte(s))
+		msg, _ := redis.StreamMessage{}.UnMarshal([]byte(s))
 		logrus.Infof("UniqueId: %d; Body: %s", msg.UniqueId, string(msg.Body.Marshal()))
 
 		connList.Each(func(index int, value interface{}) {

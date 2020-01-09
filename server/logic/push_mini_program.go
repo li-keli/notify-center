@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -20,6 +21,7 @@ var (
 )
 
 type PushMiniProgram struct {
+	ctx      *gin.Context
 	notifyVo vo.NotifyVo
 	config   db.NotifyConfig
 }

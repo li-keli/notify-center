@@ -5,7 +5,6 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
 	"notify-center/pkg/constant"
-	"notify-center/pkg/dto"
 	"time"
 )
 
@@ -30,7 +29,7 @@ func NewRedisConn() {
 }
 
 // 消息发布
-func Publish(msg *dto.RedisStreamMessage) {
+func Publish(msg *StreamMessage) {
 	s := msg.Marshal()
 	if err := client.Publish("notify/comet", s).Err(); err != nil {
 		logrus.Error("redis消息发布异常", err)

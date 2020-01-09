@@ -2,6 +2,7 @@ package logic
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/sideshow/apns2"
 	"github.com/sideshow/apns2/certificate"
 	"github.com/sideshow/apns2/payload"
@@ -13,6 +14,7 @@ import (
 
 // APNS推送
 type PushApns struct {
+	ctx      *gin.Context
 	notifyVo vo.NotifyVo
 	config   db.NotifyConfig
 }

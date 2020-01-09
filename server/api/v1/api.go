@@ -19,7 +19,6 @@ func RegisterNotify(engine *gin.Engine, logMiddle func(ctx *gin.Context)) {
 		// 注册
 		v1.POST("/terminal/register", TerminalRegister)
 		v1.POST("/terminal/unRegister", TerminalUnRegister)
-		v1.POST(`/wechat/register`, WeChatRegister)
 
 		// 下发通知
 		v1.POST(`/wechat/send`, WeChatNotify)
@@ -154,7 +153,7 @@ func Notify(ctx *gin.Context) {
 	})
 
 	// 发起推送
-	offlinePushActuator := logic.BuildPushActuator(input, one, config)
+	offlinePushActuator := logic.BuildPushActuator(ctx, input, one, config)
 	if err := offlinePushActuator.PushMessage(one.PushToken); err != nil {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(offlinePushActuator.Mode()+"平台推送失败："+err.Error()))
 		return
@@ -162,23 +161,6 @@ func Notify(ctx *gin.Context) {
 
 	trackLog.Infof("%s平台推送成功", offlinePushActuator.Mode())
 	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(offlinePushActuator.Mode()+"平台推送成功"))
-}
-
-// 微信小程序订阅消息注册
-func WeChatRegister(ctx *gin.Context) {
-	var (
-		input    vo.RegisterWeChatInputVo
-		trackLog = track_log.Logger(ctx)
-	)
-
-	err := db.NotifyRegisterWeChat{}.Insert(db.NotifyRegisterWeChat{
-		JsjUniqueId: input.JsjUniqueId,
-		PushToken:   input.PushToken,
-		CreateTime:  time.Now(),
-	})
-	if err != nil {
-		trackLog.Error("微信小程序订阅消息注册错误", err.Error())
-	}
 }
 
 // 微信小程序订阅消息下发
