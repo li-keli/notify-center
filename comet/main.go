@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	uuid "github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"notify-center/pkg/constant"
 	"notify-center/pkg/redis"
@@ -43,7 +44,7 @@ func main() {
 		connList.Each(func(index int, value interface{}) {
 			targetConn := value.(*ConnStruct)
 			if targetConn.Key == msg.UniqueId {
-				//logrus.Infof("处理广播消息 %d; %s", targetConn.Key, string(msg.Body.Marshal()))
+				logrus.Infof("处理广播消息 %d; %s", targetConn.Key, string(msg.Body.Marshal()))
 				if e := targetConn.Conn.WriteMessage(websocket.TextMessage, msg.Body.Marshal()); e != nil {
 					redis.DelHashField(strconv.Itoa(msg.UniqueId), targetConn.Sid)
 				}
@@ -52,7 +53,7 @@ func main() {
 	})
 
 	engine := gin.Default()
-	engine.GET("/v1/ws/:targetType/:uniqueId", track_log.UseLogMiddle, func(ctx *gin.Context) {
+	engine.GET("/v1/ws/:targetType/:uniqueId", func(ctx *gin.Context) {
 		var (
 			targetType, _ = strconv.Atoi(ctx.Param("targetType"))
 			uniqueId, _   = strconv.Atoi(ctx.Param("uniqueId"))
