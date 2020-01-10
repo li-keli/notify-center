@@ -66,6 +66,8 @@ func TerminalRegister(ctx *gin.Context) {
 			trackLog.Panic("终端注册入库异常", err)
 		}
 	}
+
+	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(""))
 }
 
 // 注销终端
@@ -86,6 +88,8 @@ func TerminalUnRegister(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		trackLog.Panic("终端注销异常")
 	}
+
+	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(""))
 }
 
 // 发送推送消息

@@ -6,8 +6,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/sohlich/elogrus.v3"
-	"net/http"
-	"notify-center/server/api/v1/vo"
 )
 
 const (
@@ -16,10 +14,15 @@ const (
 	esIndex = "mylog"
 )
 
+var esLog *logrus.Logger
+
+func init() {
+	esLog = EsLog(esHost, esUrl, esIndex)
+}
+
 func UseLogMiddle(ctx *gin.Context) {
 	Logger(ctx)
 	ctx.Next()
-	ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success(""))
 }
 
 // 获取日志对象
@@ -27,7 +30,7 @@ func Logger(ctx *gin.Context) *logrus.Entry {
 	if log, b := ctx.Get("log"); b {
 		return log.(*logrus.Entry)
 	} else {
-		return EsLog(esHost, esUrl, esIndex).WithField("trackId", uuid.NewV4().String())
+		return esLog.WithField("trackId", uuid.NewV4().String())
 	}
 }
 
@@ -42,6 +45,6 @@ func EsLog(esHost, urls, index string) *logrus.Logger {
 		log.Panic(err)
 	}
 	log.Hooks.Add(hook)
-	log.Infof("GinLogConfig ring in %s - %s", esHost, index)
+	log.Infof("Es日志接入 %s - %s", esHost, index)
 	return log
 }
