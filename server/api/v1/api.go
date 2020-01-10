@@ -112,6 +112,18 @@ func Notify(ctx *gin.Context) {
 	if all, _ := redis.GetHashAll(strconv.Itoa(input.JsjUniqueId)); len(all) > 0 {
 		err := logic.PushWSocket{NotifyVo: input}.PushMessage()
 		if err == nil {
+			// 记录推送数据
+			nMessage.Insert(db.NotifyMsg{
+				JsjUniqueId:      input.JsjUniqueId,
+				PushToken:        strconv.Itoa(input.JsjUniqueId),
+				PlatformTypeId:   0,
+				PlatformTypeName: "",
+				TargetTypeId:     input.TargetType,
+				TargetTypeName:   constant.TargetTypeValueOf(input.TargetType),
+				DataContent:      input.DataToStr(),
+				GroupName:        input.GroupName,
+				CreateTime:       time.Now(),
+			})
 			ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success("Socket推送成功"))
 			return
 		} else {
