@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"notify-center/pkg/constant"
 	"notify-center/pkg/redis"
-	"notify-center/pkg/track_log"
 	"strconv"
 )
 
@@ -66,8 +65,6 @@ func main() {
 				TName: constant.TargetTypeValueOf(constant.TargetType(targetType)),
 				Conn:  ws,
 			}
-
-			trackLog = track_log.Logger(ctx)
 		)
 
 		if err != nil {
@@ -77,12 +74,12 @@ func main() {
 		connList.Add(connModule)
 		connModuleBytes, _ := json.Marshal(connModule)
 		redis.SetHash(strconv.Itoa(uniqueId), sId, connModuleBytes, 30)
-		trackLog.Infof("WS连接数：%d", connList.Size())
+		logrus.Infof("WS连接数：%d", connList.Size())
 		defer func() {
 			ws.Close()
 			connList.Remove(connList.IndexOf(connModule))
 			redis.DelHashField(strconv.Itoa(uniqueId), sId)
-			trackLog.Infof("WS连接数：%d", connList.Size())
+			logrus.Infof("WS连接数：%d", connList.Size())
 		}()
 
 		for {
