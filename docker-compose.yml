@@ -9,7 +9,6 @@ services:
     ports:
       - 20606:8081
     deploy:
-      replicas: 1
       update_config:
         delay: 20s
       restart_policy:
@@ -25,10 +24,7 @@ services:
     image: docker.jsjit.cn/middleware-team/notify-center-server:v2-${VERSION}
     ports:
       - 20607:8080
-    environment:
-      GIN_MODE: ${GIN_MODE}
     deploy:
-      replicas: 1
       update_config:
         delay: 20s
       restart_policy:
