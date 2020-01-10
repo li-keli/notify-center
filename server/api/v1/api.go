@@ -116,6 +116,7 @@ func Notify(ctx *gin.Context) {
 			nMessage.Insert(db.NotifyMsg{
 				JsjUniqueId:      input.JsjUniqueId,
 				PushToken:        strconv.Itoa(input.JsjUniqueId),
+				Router:           input.Route,
 				Title:            input.Title,
 				Message:          input.Message,
 				PlatformTypeId:   0,
@@ -161,6 +162,7 @@ func Notify(ctx *gin.Context) {
 	nMessage.Insert(db.NotifyMsg{
 		JsjUniqueId:      one.JsjUniqueId,
 		PushToken:        one.PushToken,
+		Router:           input.Route,
 		Title:            input.Title,
 		Message:          input.Message,
 		PlatformTypeId:   one.PlatformTypeId,

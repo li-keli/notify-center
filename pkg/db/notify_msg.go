@@ -11,6 +11,7 @@ type NotifyMsg struct {
 	PushToken        string                `json:"PushToken" gorm:"column:push_token"`
 	Title            string                `json:"Title" gorm:"column:title"`
 	Message          string                `json:"Message" gorm:"column:message"`
+	Router           string                `json:"Router" gorm:"column:router"`
 	DataContent      string                `json:"DataContent" gorm:"column:data_content"`
 	PlatformTypeId   constant.PlatformType `json:"PlatformTypeId" gorm:"column:platform_type_id"`
 	PlatformTypeName string                `json:"PlatformTypeName" gorm:"column:platform_type_name"`

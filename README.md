@@ -112,6 +112,9 @@ WebSocket接入端点：wss://域名/notification-comet/v1/ws/{targetType}/{jsjU
 | ----------- | ------ | ---------------- |
 | Id          | int    | 编号             |
 | PushToken   | string | 目标的唯一识别码 |
+| Title   | string | 标题 |
+| Message   | string | 简要描述 |
+| Router | string | 路由键         |
 | DataContent | string | 消息内容         |
 | GroupName   | string | 分组名           |
 | CreateTime  | time   | 发送时间         |
@@ -126,26 +129,18 @@ WebSocket接入端点：wss://域名/notification-comet/v1/ws/{targetType}/{jsjU
     },
     "Msg": [
         {
-            "Id": 73,
-            "PushToken": "383be6e2c0b7bacca5ee0ef5417e40aa321e2985359c8244b4b55b51affd908c",
-            "DataContent": "{\"jsjUniqueId\":2059797,\"linkUrl\":\"\",\"message\":\"扫描成功\",\"opType\":1,\"orderNumber\":0,\"title\":\"分享消息\"}",
-            "PlatformTypeId": 10,
-            "PlatformTypeName": "IOS",
-            "TargetTypeId": 600,
-            "TargetTypeName": "空铁1号",
-            "GroupName": "分享消息",
-            "CreateTime": "2020-01-08T05:58:05Z"
-        },
-        {
-            "Id": 72,
-            "PushToken": "383be6e2c0b7bacca5ee0ef5417e40aa321e2985359c8244b4b55b51affd908c",
-            "DataContent": "{\"jsjUniqueId\":2059797,\"linkUrl\":\"\",\"message\":\"扫描成功\",\"opType\":1,\"orderNumber\":0,\"title\":\"分享消息\"}",
-            "PlatformTypeId": 10,
-            "PlatformTypeName": "IOS",
-            "TargetTypeId": 600,
-            "TargetTypeName": "空铁1号",
-            "GroupName": "分享消息",
-            "CreateTime": "2020-01-08T05:57:51Z"
+            "Id": 2,
+            "JsjUniqueId": 2059797,
+            "PushToken": "2059797",
+            "Title": "分享消息",
+            "Message": "扫描成功",
+            "DataContent": "{\"jsjUniqueId\":\"2059797\",\"linkUrl\":\"\",\"message\":\"扫描成功\",\"opType\":\"1\",\"orderNumber\":\"0\",\"title\":\"分享消息\"}",
+            "PlatformTypeId": 0,
+            "PlatformTypeName": "",
+            "TargetTypeId": 400,
+            "TargetTypeName": "空铁管家微信小程序",
+            "GroupName": "测试组",
+            "CreateTime": "2020-01-10 15:26:40"
         }
     ]
 }
