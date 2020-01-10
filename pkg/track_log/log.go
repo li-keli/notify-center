@@ -11,7 +11,7 @@ import (
 const (
 	esHost  = "172.16.7.20"
 	esUrl   = "http://172.16.7.20:9200"
-	esIndex = "mylog"
+	esIndex = "notify"
 )
 
 var esLog *logrus.Logger
