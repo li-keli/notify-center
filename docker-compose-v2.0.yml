@@ -1,0 +1,9 @@
+version: "3.7"
+
+services:
+  websocket:
+    deploy:
+      replicas: 2
+  webapi:
+    deploy:
+      replicas: 1
