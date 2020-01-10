@@ -54,13 +54,13 @@ func TerminalRegister(ctx *gin.Context) {
 	}
 
 	if one, _ := register.FindOne(register.JsjUniqueId); one.JsjUniqueId != 0 {
-		trackLog.Info("更新")
+		//trackLog.Info("更新")
 		if err := register.UpdateSpecify(register); err != nil {
 			ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error("更新异常"))
-			trackLog.Panic("数段注册更新异常", err)
+			trackLog.Panic("终端注册更新异常", err)
 		}
 	} else {
-		trackLog.Info("新增")
+		//trackLog.Info("新增")
 		if err := register.Insert(register); err != nil {
 			ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error("更新异常"))
 			trackLog.Panic("终端注册入库异常", err)
@@ -81,7 +81,7 @@ func TerminalUnRegister(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		trackLog.Panic("参数异常")
 	}
-	trackLog.Info(input)
+	trackLog.Info(input.PushToken, input)
 
 	err := db.NotifyRegister{}.DelOne(input.JsjUniqueId, input.PlatformType, input.TargetType)
 	if err != nil {
@@ -116,13 +116,15 @@ func Notify(ctx *gin.Context) {
 			nMessage.Insert(db.NotifyMsg{
 				JsjUniqueId:      input.JsjUniqueId,
 				PushToken:        strconv.Itoa(input.JsjUniqueId),
+				Title:            input.Title,
+				Message:          input.Message,
 				PlatformTypeId:   0,
 				PlatformTypeName: "",
 				TargetTypeId:     input.TargetType,
 				TargetTypeName:   constant.TargetTypeValueOf(input.TargetType),
 				DataContent:      input.DataToStr(),
 				GroupName:        input.GroupName,
-				CreateTime:       time.Now(),
+				CreateTime:       constant.JsonTime(time.Now()),
 			})
 			ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success("Socket推送成功"))
 			return
@@ -159,13 +161,15 @@ func Notify(ctx *gin.Context) {
 	nMessage.Insert(db.NotifyMsg{
 		JsjUniqueId:      one.JsjUniqueId,
 		PushToken:        one.PushToken,
+		Title:            input.Title,
+		Message:          input.Message,
 		PlatformTypeId:   one.PlatformTypeId,
 		PlatformTypeName: one.PlatformTypeName,
 		TargetTypeId:     input.TargetType,
 		TargetTypeName:   constant.TargetTypeValueOf(input.TargetType),
 		DataContent:      input.DataToStr(),
 		GroupName:        input.GroupName,
-		CreateTime:       time.Now(),
+		CreateTime:       constant.JsonTime(time.Now()),
 	})
 
 	// 发起推送
