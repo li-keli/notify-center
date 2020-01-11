@@ -21,8 +21,9 @@ func RegisterNotify(engine *gin.Engine, logMiddle func(ctx *gin.Context)) {
 		v1.POST("/terminal/unRegister", TerminalUnRegister)
 
 		// 下发通知
-		v1.POST(`/wechat/send`, WeChatNotify)
 		v1.POST("/notification/send", Notify)
+		v1.POST(`/wechat/send`, WeChatNotify)
+		v1.POST("/dingding/send", DingDingNotify)
 
 		// 获取历史消息
 		v1.POST("/msg", MessageList)
@@ -187,6 +188,18 @@ func Notify(ctx *gin.Context) {
 
 // 微信小程序订阅消息下发
 func WeChatNotify(ctx *gin.Context) {
+	//var (
+	//	input     vo.NotifyVo
+	//	nConfig   db.NotifyConfig
+	//	nRegister db.NotifyRegister
+	//	nMessage  db.NotifyMsg
+	//
+	//	trackLog = track_log.Logger(ctx)
+	//)
+}
+
+// 钉钉消息下发
+func DingDingNotify(ctx *gin.Context) {
 	//var (
 	//	input     vo.NotifyVo
 	//	nConfig   db.NotifyConfig
