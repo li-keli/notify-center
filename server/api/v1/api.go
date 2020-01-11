@@ -22,7 +22,7 @@ func RegisterNotify(engine *gin.Engine, logMiddle func(ctx *gin.Context)) {
 
 		// 下发通知
 		v1.POST("/notification/send", Notify)
-		v1.POST(`/wechat/send`, WeChatNotify)
+		v1.POST("/wechat/send", WeChatNotify)
 		v1.POST("/dingding/send", DingDingNotify)
 
 		// 获取历史消息
