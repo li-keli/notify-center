@@ -11,8 +11,6 @@ project-build:
     - /^release\/.*$/
   script:
     - docker run -i --rm -v $(pwd):/usr/work -w /usr/work docker.jsjit.cn/golang:1.12 ./deploy.sh
-    - export GIN_MODE=debug
-    - export REPLICAS=1
     - export VERSION=$(git --no-pager log -n 1 --no-merges --pretty=format:"%h" HEAD)
     - docker-compose build
     - docker-compose push
