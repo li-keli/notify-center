@@ -30,7 +30,10 @@ func Logger(ctx *gin.Context) *logrus.Entry {
 	if log, b := ctx.Get("log"); b {
 		return log.(*logrus.Entry)
 	} else {
-		return esLog.WithField("trackId", uuid.NewV4().String())
+		return esLog.WithFields(logrus.Fields{
+			"trackId":         uuid.NewV4().String(),
+			"x-forwarded-for": ctx.GetHeader("x-forwarded-for"),
+		})
 	}
 }
 
