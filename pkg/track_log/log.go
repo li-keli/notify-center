@@ -6,6 +6,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/sohlich/elogrus.v3"
+	"notify-center/pkg/constant"
 )
 
 const (
@@ -31,6 +32,7 @@ func Logger(ctx *gin.Context) *logrus.Entry {
 		return log.(*logrus.Entry)
 	} else {
 		return esLog.WithFields(logrus.Fields{
+			"mode":            constant.ProductionMode,
 			"trackId":         uuid.NewV4().String(),
 			"x-forwarded-for": ctx.GetHeader("x-forwarded-for"),
 		})
