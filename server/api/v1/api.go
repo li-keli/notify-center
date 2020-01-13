@@ -41,7 +41,7 @@ func TerminalRegister(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		trackLog.Panic("参数异常")
 	}
-	trackLog.Info(input)
+	trackLog.Info("注册终端入参", input)
 
 	register := db.NotifyRegister{
 		JsjUniqueId:      input.JsjUniqueId,
@@ -82,7 +82,7 @@ func TerminalUnRegister(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		trackLog.Panic("参数异常")
 	}
-	trackLog.Info(input.PushToken, input)
+	trackLog.Info("注销终端入参", input)
 
 	err := db.NotifyRegister{}.DelOne(input.JsjUniqueId, input.PlatformType, input.TargetType)
 	if err != nil {
@@ -107,7 +107,7 @@ func Notify(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		return
 	}
-	trackLog.Info("请求数据：", input)
+	trackLog.Info("发送推送消息入参：", input)
 
 	// 尝试进行WebSocket推送
 	if all, _ := redis.GetHashAll(strconv.Itoa(input.JsjUniqueId)); len(all) > 0 {
@@ -129,6 +129,7 @@ func Notify(ctx *gin.Context) {
 				CreateTime:       constant.JsonTime(time.Now()),
 			})
 			ctx.JSON(http.StatusOK, vo.BaseOutput{}.Success("Socket推送成功"))
+			trackLog.Info("Socket推送成功")
 			return
 		} else {
 			trackLog.Warn("WebSocket实时推送失败")
@@ -221,7 +222,7 @@ func MessageList(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
 		return
 	}
-	trackLog.Info("请求数据：", input)
+	trackLog.Info("消息列表入参", input)
 
 	if input.JsjUniqueId == 0 && input.PushToken == "" {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error("JsjUniqueId和PushToken不能同时为空"))
