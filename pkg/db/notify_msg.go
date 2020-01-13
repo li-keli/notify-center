@@ -1,7 +1,6 @@
 package db
 
 import (
-	"github.com/sirupsen/logrus"
 	"notify-center/pkg/constant"
 )
 
@@ -21,17 +20,12 @@ type NotifyMsg struct {
 	CreateTime       constant.JsonTime     `json:"CreateTime" gorm:"column:create_time"`
 }
 
-func (NotifyMsg) Insert(m NotifyMsg) {
-	if err := conn.Create(&m).Error; err != nil {
-		logrus.Error("历史消息存储错误，但忽略了这个错误")
-	}
+func (NotifyMsg) Insert(m NotifyMsg) (err error) {
+	err = conn.Create(&m).Error
+	return
 }
 
 func (NotifyMsg) FindAll(jsjUniqueId int, token string, offset, limit int) (n []NotifyMsg, err error) {
 	err = conn.Where(`jsj_unique_id = ? or push_token = ?`, jsjUniqueId, token).Offset(offset - 1).Limit(limit).Order(`create_time desc`).Find(&n).Error
-	//location, _ := time.LoadLocation("")
-	//for i, msg := range n {
-	//	n[i].CreateTime = msg.CreateTime.In(location)
-	//}
 	return
 }

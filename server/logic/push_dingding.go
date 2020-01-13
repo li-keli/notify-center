@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
+	"notify-center/pkg/track_log"
 	"notify-center/server/api/v1/vo"
 )
 
@@ -60,13 +61,14 @@ func (p PushDingDing) PushMessage(param ...string) error {
 				Text:  p.notifyVo.Message,
 			}},
 		}
-		out DingDingPushOut
+		trackLog = track_log.Logger(p.ctx)
+		out      DingDingPushOut
 	)
 	marshal, _ := json.Marshal(in)
 	client := http.Client{}
 	request, err := http.NewRequest("POST", "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token="+p.dingDingAccessToken(), bytes.NewBuffer(marshal))
 	if err != nil {
-		logrus.Error(err)
+		trackLog.Error(err)
 	}
 	response, err := client.Do(request)
 	defer response.Body.Close()

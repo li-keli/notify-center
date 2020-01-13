@@ -2,9 +2,9 @@ package logic
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	jpushclient "github.com/ylywyn/jpush-api-go-client"
 	"notify-center/pkg/db"
+	"notify-center/pkg/track_log"
 	"notify-center/server/api/v1/vo"
 )
 
@@ -20,10 +20,13 @@ func (p PushJPush) Mode() string {
 }
 
 func (p PushJPush) PushMessage(param ...string) error {
-	var pushToken = param[0]
+	var (
+		pushToken = param[0]
+		trackLog  = track_log.Logger(p.ctx)
+	)
 	config, err := p.config.AndroidConfig()
 	if err != nil {
-		logrus.Error("构造极光推送配置错误", err)
+		trackLog.Error("构造极光推送配置错误，", err.Error(), p.config.ConfigData)
 		return err
 	}
 
@@ -54,10 +57,9 @@ func (p PushJPush) PushMessage(param ...string) error {
 	payload.SetMessage(&msg)
 	payload.SetNotice(&notice)
 	bytes, err := payload.ToBytes()
-	logrus.Info(string(bytes))
 
 	str, err := AndroidClient.Send(bytes)
-	logrus.Info(str)
+	trackLog.Info(str)
 
 	return err
 }
