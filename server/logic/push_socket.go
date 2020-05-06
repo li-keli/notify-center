@@ -1,27 +1,25 @@
 package logic
 
 import (
-	"encoding/json"
-	"notify-center/pkg/dto"
+	"github.com/gin-gonic/gin"
 	"notify-center/pkg/redis"
 	"notify-center/server/api/v1/vo"
 )
 
 // WebSocket推送（独立推送）
 type PushWSocket struct {
+	ctx      *gin.Context
 	NotifyVo vo.NotifyVo
 }
 
-func (p PushWSocket) PushMessage() error {
-	marshal, e := json.Marshal(p.NotifyVo.Data)
+func (p PushWSocket) PushMessage() (err error) {
 	// 发送WS广播
-	redis.Publish(&dto.RedisStreamMessage{
+	redis.Publish(&redis.StreamMessage{
 		UniqueId: p.NotifyVo.JsjUniqueId,
-		Body: dto.RedisStreamMessageBody{
+		Body: redis.StreamMessageBody{
 			MAction: p.NotifyVo.Route,
-			MBody:   string(marshal),
+			MBody:   p.NotifyVo.DataToStr(),
 		},
 	})
-
-	return e
+	return
 }

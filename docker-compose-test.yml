@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  websocket:
+    environment:
+      GIN_MODE: debug
+    deploy:
+      replicas: 1
+  webapi:
+    environment:
+      GIN_MODE: debug
+    deploy:
+      replicas: 1

@@ -1,14 +1,16 @@
 package logic
 
 import (
-	"github.com/sirupsen/logrus"
+	"github.com/gin-gonic/gin"
 	jpushclient "github.com/ylywyn/jpush-api-go-client"
 	"notify-center/pkg/db"
+	"notify-center/pkg/tracklog"
 	"notify-center/server/api/v1/vo"
 )
 
 // Android JPush推送
 type PushJPush struct {
+	ctx      *gin.Context
 	notifyVo vo.NotifyVo
 	config   db.NotifyConfig
 }
@@ -18,10 +20,13 @@ func (p PushJPush) Mode() string {
 }
 
 func (p PushJPush) PushMessage(param ...string) error {
-	var pushToken = param[0]
+	var (
+		pushToken = param[0]
+		trackLog  = tracklog.Logger(p.ctx)
+	)
 	config, err := p.config.AndroidConfig()
 	if err != nil {
-		logrus.Error("构造极光推送配置错误", err)
+		trackLog.Error("构造极光推送配置错误，", err.Error(), p.config.ConfigData)
 		return err
 	}
 
@@ -37,7 +42,7 @@ func (p PushJPush) PushMessage(param ...string) error {
 		Alert: p.notifyVo.Title,
 		Extras: map[string]interface{}{
 			"MAction": p.notifyVo.Route,
-			"MBody":   string(p.notifyVo.DataToBytes()),
+			"MBody":   p.notifyVo.DataToStr(),
 		}},
 	)
 
@@ -52,10 +57,9 @@ func (p PushJPush) PushMessage(param ...string) error {
 	payload.SetMessage(&msg)
 	payload.SetNotice(&notice)
 	bytes, err := payload.ToBytes()
-	logrus.Info(string(bytes))
 
 	str, err := AndroidClient.Send(bytes)
-	logrus.Info(str)
+	trackLog.Info(str)
 
 	return err
 }

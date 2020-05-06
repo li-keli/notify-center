@@ -1,3 +1,4 @@
+// 推送处理器，集成WebSocket、Apns、极光实现多方的推送
 package main
 
 import (
@@ -5,6 +6,7 @@ import (
 	"net/http"
 	"notify-center/pkg/db"
 	"notify-center/pkg/redis"
+	"notify-center/pkg/tracklog"
 	v1 "notify-center/server/api/v1"
 )
 
@@ -13,12 +15,8 @@ func main() {
 	redis.NewRedisConn()
 
 	engine := gin.Default()
-	engine.GET("/health", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "up")
-	})
-	engine.POST("/v2/terminal/register", v1.RegisterTerminal)
-	engine.POST("/v2/terminal/unRegister", v1.UnRegisterTerminal)
-	engine.POST("/v2/notification/send", v1.Notify)
+	engine.GET("/actuator/health", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"status": "up"}) })
+	v1.RegisterNotify(engine, tracklog.UseLogMiddle)
 
 	_ = engine.Run()
 }

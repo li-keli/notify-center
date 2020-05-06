@@ -3,7 +3,6 @@ package db
 
 import (
 	"encoding/json"
-	"github.com/sirupsen/logrus"
 	"notify-center/pkg/constant"
 	"time"
 )
@@ -23,9 +22,6 @@ type IosConfig struct {
 	P12Path  string
 	BundleId string
 	Password string
-
-	P12DevPath  string
-	P12ProdPath string
 }
 
 type AndroidConfig struct {
@@ -34,22 +30,12 @@ type AndroidConfig struct {
 }
 
 func (n NotifyConfig) IosConfig() (config IosConfig, err error) {
-	if err = json.Unmarshal([]byte(n.ConfigData), &config); err != nil {
-		logrus.Error("序列化IosConfig错误，原文：", n.ConfigData)
-		return
-	}
-	if constant.ProductionMode {
-		config.P12Path = config.P12ProdPath
-	} else {
-		config.P12Path = config.P12DevPath
-	}
+	err = json.Unmarshal([]byte(n.ConfigData), &config)
 	return
 }
 
 func (n NotifyConfig) AndroidConfig() (config AndroidConfig, err error) {
-	if err := json.Unmarshal([]byte(n.ConfigData), &config); err != nil {
-		logrus.Error("序列化AndroidConfig错误，原文：", n.ConfigData)
-	}
+	err = json.Unmarshal([]byte(n.ConfigData), &config)
 	return
 }
 

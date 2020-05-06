@@ -4,44 +4,41 @@ import (
 	"errors"
 	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
-	"notify-center/pkg/dto"
 	"time"
 )
 
 var client *redis.Client
 
 func NewRedisConn() {
+	var addr = "127.0.0.1:6379"
 	client = redis.NewClient(&redis.Options{
-		Addr:     "172.16.7.20:6379",
+		Addr:     addr,
 		Password: "",
 		DB:       3,
 	})
 	if _, e := client.Ping().Result(); e != nil {
-		logrus.Info(e)
+		logrus.Fatal("Redis连接失败: ", e.Error())
 	}
 	logrus.Info("Redis连接成功...")
 }
 
 // 消息发布
-func Publish(msg *dto.RedisStreamMessage) {
+func Publish(msg *StreamMessage) {
 	s := msg.Marshal()
-	if err := client.Publish("homework", s).Err(); err != nil {
+	if err := client.Publish("notify/comet", s).Err(); err != nil {
 		logrus.Error("redis消息发布异常", err)
 	}
 }
 
 // 消息订阅
-func Subscribe(handle func(msg *dto.RedisStreamMessage)) {
-	pubSub := client.Subscribe("homework")
+func Subscribe(handle func(s string)) {
+	pubSub := client.Subscribe("notify/comet")
 	if _, e := pubSub.Receive(); e != nil {
 		logrus.Fatal("redis服务订阅失败")
 	}
 	channel := pubSub.Channel()
 	for msg := range channel {
-		var msgObj = dto.RedisStreamMessage{}
-		logrus.Info("收到消息 ", msg.Payload)
-		_ = msgObj.UnMarshal([]byte(msg.Payload))
-		handle(&msgObj)
+		handle(msg.Payload)
 	}
 }
 
