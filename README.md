@@ -4,6 +4,8 @@
 
 ## 使用说明
 
+> 项目无法直接运行，部分敏感的secret或者域名已经屏蔽，需要自行填写。
+
 目前推送网关支持`APNS、极光、WebSocket`，存储使用`MongoDB`，消息订阅使用`Redis`，track日志使用`ELK`三件套组件收集
 
-手册可以查阅`manual.md`，部分敏感的token或者域名已经屏蔽，需要自行填写。
+手册可以查阅`manual.md`。
