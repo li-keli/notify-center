@@ -62,8 +62,8 @@ WebSocket接入端点：wss://域名/notification-comet/v1/ws/{targetType}/{jsjU
 
 | 变量        | 类型     | 备注                                                         |
 | ----------- | -------- | ------------------------------------------------------------ |
-| JsjUniqueId | int      | 推送的目标，用户编号、员工编号                               |
-| TargetType  | int      | 推送的应用<br />100：金色世纪<br />200：空铁管家<br />300：员工端<br />400：微信小程序<br />500：钉钉<br />600：空铁1号 |
+| JsjUniqueId | int      | 用户编号                               |
+| TargetType  | int      | 推送的应用|
 | Title       | string   | 标题                                                         |
 | Message     | string   | 摘要                                                         |
 | GroupName   | string   | 自定义消息分组名称，请一类消息保持使用同一个名称             |
@@ -97,8 +97,6 @@ WebSocket接入端点：wss://域名/notification-comet/v1/ws/{targetType}/{jsjU
     "Limit": 10
 }
 ```
-
-
 
 ### 4.2 响应
 
@@ -134,7 +132,7 @@ WebSocket接入端点：wss://域名/notification-comet/v1/ws/{targetType}/{jsjU
             "PlatformTypeId": 0,
             "PlatformTypeName": "",
             "TargetTypeId": 400,
-            "TargetTypeName": "空铁管家微信小程序",
+            "TargetTypeName": "微信小程序",
             "GroupName": "测试组",
             "CreateTime": "2020-01-10 15:26:40"
         }
