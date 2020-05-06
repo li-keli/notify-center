@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"notify-center/pkg/db"
 	"notify-center/pkg/redis"
-	"notify-center/pkg/track_log"
+	"notify-center/pkg/tracklog"
 	v1 "notify-center/server/api/v1"
 )
 
@@ -16,7 +16,7 @@ func main() {
 
 	engine := gin.Default()
 	engine.GET("/actuator/health", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"status": "up"}) })
-	v1.RegisterNotify(engine, track_log.UseLogMiddle)
+	v1.RegisterNotify(engine, tracklog.UseLogMiddle)
 
 	_ = engine.Run()
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	jpushclient "github.com/ylywyn/jpush-api-go-client"
 	"notify-center/pkg/db"
-	"notify-center/pkg/track_log"
+	"notify-center/pkg/tracklog"
 	"notify-center/server/api/v1/vo"
 )
 
@@ -22,7 +22,7 @@ func (p PushJPush) Mode() string {
 func (p PushJPush) PushMessage(param ...string) error {
 	var (
 		pushToken = param[0]
-		trackLog  = track_log.Logger(p.ctx)
+		trackLog  = tracklog.Logger(p.ctx)
 	)
 	config, err := p.config.AndroidConfig()
 	if err != nil {

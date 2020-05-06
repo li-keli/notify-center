@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
-	"notify-center/pkg/track_log"
+	"notify-center/pkg/tracklog"
 	"notify-center/server/api/v1/vo"
 )
 
@@ -61,7 +61,7 @@ func (p PushDingDing) PushMessage(param ...string) error {
 				Text:  p.notifyVo.Message,
 			}},
 		}
-		trackLog = track_log.Logger(p.ctx)
+		trackLog = tracklog.Logger(p.ctx)
 		out      DingDingPushOut
 	)
 	marshal, _ := json.Marshal(in)

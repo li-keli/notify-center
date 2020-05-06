@@ -1,4 +1,4 @@
-package track_log
+package tracklog
 
 import (
 	"github.com/gin-gonic/gin"

@@ -8,7 +8,7 @@ import (
 	"github.com/sideshow/apns2/payload"
 	"notify-center/pkg/constant"
 	"notify-center/pkg/db"
-	"notify-center/pkg/track_log"
+	"notify-center/pkg/tracklog"
 	"notify-center/server/api/v1/vo"
 )
 
@@ -26,7 +26,7 @@ func (p PushApns) Mode() string {
 func (p PushApns) PushMessage(param ...string) error {
 	var (
 		pushToken = param[0]
-		trackLog  = track_log.Logger(p.ctx)
+		trackLog  = tracklog.Logger(p.ctx)
 	)
 	config, err := p.config.IosConfig()
 	if err != nil {

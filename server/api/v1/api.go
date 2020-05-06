@@ -6,7 +6,7 @@ import (
 	"notify-center/pkg/constant"
 	"notify-center/pkg/db"
 	"notify-center/pkg/redis"
-	"notify-center/pkg/track_log"
+	"notify-center/pkg/tracklog"
 	"notify-center/server/api/v1/vo"
 	"notify-center/server/logic"
 	"strconv"
@@ -34,7 +34,7 @@ func RegisterNotify(engine *gin.Engine, logMiddle func(ctx *gin.Context)) {
 func TerminalRegister(ctx *gin.Context) {
 	var (
 		input    vo.RegisterTerminalInputVo
-		trackLog = track_log.Logger(ctx)
+		trackLog = tracklog.Logger(ctx)
 	)
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -75,7 +75,7 @@ func TerminalRegister(ctx *gin.Context) {
 func TerminalUnRegister(ctx *gin.Context) {
 	var (
 		input    vo.UnRegisterTerminalInputVo
-		trackLog = track_log.Logger(ctx)
+		trackLog = tracklog.Logger(ctx)
 	)
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -103,7 +103,7 @@ func Notify(ctx *gin.Context) {
 		nRegister db.NotifyRegister
 		nMessage  db.NotifyMsg
 
-		trackLog = track_log.Logger(ctx)
+		trackLog = tracklog.Logger(ctx)
 	)
 	if err := ctx.BindJSON(&input); err != nil {
 		ctx.JSON(http.StatusOK, vo.BaseOutput{}.Error(err.Error()))
@@ -223,7 +223,7 @@ func DingDingNotify(ctx *gin.Context) {
 func MessageList(ctx *gin.Context) {
 	var (
 		input    vo.MsgListInputVo
-		trackLog = track_log.Logger(ctx)
+		trackLog = tracklog.Logger(ctx)
 	)
 
 	if err := ctx.ShouldBindJSON(&input); err != nil {
