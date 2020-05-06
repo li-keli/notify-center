@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	dingDingAccessTokenUrl = "https://openservice.jsjinfo.cn/tokencenter/v1/mini/dingding"
+	dingDingAccessTokenUrl = ""
 )
 
 type PushDingDing struct {
@@ -99,7 +99,7 @@ func (p PushDingDing) dingDingUserId(mobile string) (userId string) {
 func (PushDingDing) dingDingAccessToken() string {
 	client := http.Client{}
 	request, _ := http.NewRequest("GET", dingDingAccessTokenUrl, nil)
-	request.Header.Add("token", "VPYQnbnx2pp7rJxGI7v8HDjl2JJGyWyV")
+	request.Header.Add("token", "VPY****")
 	response, _ := client.Do(request)
 	defer response.Body.Close()
 

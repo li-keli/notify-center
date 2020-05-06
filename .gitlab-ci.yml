@@ -10,7 +10,7 @@ project-build:
     - /^preview\/.*$/
     - /^release\/.*$/
   script:
-    - docker run -i --rm -v $(pwd):/usr/work -w /usr/work docker.jsjit.cn/golang:1.12 ./deploy.sh
+    - docker run -i --rm -v $(pwd):/usr/work -w /usr/work golang:1.12 ./deploy.sh
     - export VERSION=$(git --no-pager log -n 1 --no-merges --pretty=format:"%h" HEAD)
     - docker-compose build
     - docker-compose push
@@ -33,7 +33,7 @@ notify-center-test-deploy:
     - MESSAGE=$(git --no-pager log -n 1 --no-merges --pretty=format:"%s" HEAD)
     - MSG="【推送网关V2】\n发布环境：🟡 测试环境 \n发布者：$AUTHOR \n版本hash：$VERSION \n更新日志：$MESSAGE"
     - >
-      curl 'https://oapi.dingtalk.com/robot/send?access_token=784334b948516948bcbf062d811f0d2c18ac7303367daf7fc61afdca917ae234'
+      curl 'https://oapi.dingtalk.com/robot/send?access_token=*******'
       -H 'Content-Type: application/json'
       -d '{"msgtype":"text","text":{"content":"'"$MSG"'"}}'
 
@@ -55,6 +55,6 @@ notify-center-prod:
     - MESSAGE=$(git --no-pager log -n 1 --no-merges --pretty=format:"%s" HEAD)
     - MSG="【推送网关V2】\n发布环境：🟢 生产环境 \n发布者：$AUTHOR \n版本hash：$VERSION \n更新日志：$MESSAGE"
     - >
-      curl 'https://oapi.dingtalk.com/robot/send?access_token=784334b948516948bcbf062d811f0d2c18ac7303367daf7fc61afdca917ae234'
+      curl 'https://oapi.dingtalk.com/robot/send?access_token=*******'
       -H 'Content-Type: application/json'
       -d '{"msgtype":"text","text":{"content":"'"$MSG"'"}}'

@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	esHost  = "172.16.7.20"
-	esUrl   = "http://172.16.7.20:9200"
+	esHost  = "127.0.0.1"
+	esUrl   = "http://127.0.0.1:9200"
 	esIndex = "notify"
 )
 

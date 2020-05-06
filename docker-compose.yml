@@ -5,7 +5,7 @@ services:
     build:
       context: ./comet
       dockerfile: Dockerfile
-    image: docker.jsjit.cn/middleware-team/notify-center-comet:v2-${VERSION}
+    image: 你的仓库/middleware-team/notify-center-comet:${VERSION}
     ports:
       - 20606:8081
     deploy:
@@ -21,7 +21,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    image: docker.jsjit.cn/middleware-team/notify-center-server:v2-${VERSION}
+    image: 你的仓库/middleware-team/notify-center-server:${VERSION}
     ports:
       - 20607:8080
     deploy:

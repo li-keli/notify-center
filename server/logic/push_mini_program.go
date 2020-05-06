@@ -17,7 +17,7 @@ import (
 var (
 	// 微信服务器端点
 	weChatHost           = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token="
-	weChatAccessTokenUrl = "https://openservice.jsjinfo.cn/tokencenter/v1/mini/ktgj"
+	weChatAccessTokenUrl = "https://*******/ktgj"
 )
 
 type PushMiniProgram struct {
@@ -65,7 +65,7 @@ func (p PushMiniProgram) PushMessage(param ...string) error {
 func (PushMiniProgram) weChatAccessToken() string {
 	client := http.Client{}
 	request, _ := http.NewRequest("GET", weChatAccessTokenUrl, nil)
-	request.Header.Add("token", "VPYQnbnx2pp7rJxGI7v8HDjl2JJGyWyV")
+	request.Header.Add("token", "VPY***")
 	response, _ := client.Do(request)
 	defer response.Body.Close()
 

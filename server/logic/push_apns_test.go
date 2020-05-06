@@ -12,7 +12,7 @@ import (
 )
 
 func TestPushApns(t *testing.T) {
-	cert, err := certificate.FromP12File("../certificates/kt_no1_debug.p12", "1")
+	cert, err := certificate.FromP12File("../certificates/certificates_debug.p12", "1")
 	if err != nil {
 		log.Fatal("Cert Error:", err)
 	}
@@ -55,7 +55,7 @@ func TestPushApns_PushMessage(t *testing.T) {
 			PlatformTypeName: "IOS",
 			TargetTypeId:     600,
 			TargetTypeName:   "KtNo1",
-			ConfigData:       `{"bundleId":"cn.com.jsj.share","p12DevPath":"../certificates/kt_no1_debug.p12","p12ProdPath":"certificates/kt_no1_prod.p12","password":"1"}`,
+			ConfigData:       `{"bundleId":"cn.com.jsj.share","p12DevPath":"../certificates/certificates_debug.p12","p12ProdPath":"certificates/certificates_debug.p12","password":"123"}`,
 			CreateTime:       time.Now(),
 		},
 	}.PushMessage("383be6e2c0b7bacca5ee0ef5417e40aa321e2985359c8244b4b55b51affd908c")
